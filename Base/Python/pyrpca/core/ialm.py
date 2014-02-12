@@ -109,6 +109,8 @@ def recover(D, gamma=None):
 
     A_hat = np.zeros(D.shape)
     E_hat = np.zeros(D.shape)
+    rank_est = -1
+    non_zero = -1
 
     # cf. section "Choosing Parameters" of [2]
     m = 1.25/l2n
@@ -156,6 +158,7 @@ def recover(D, gamma=None):
         if conv_crit < tol:
             converged = True
 
+
         if k % 10 == 0:
             rank_est = np.linalg.matrix_rank(A_hat)
             non_zero = len(np.where(np.asarray(np.abs(E_hat)).ravel()>0)[0])
@@ -168,7 +171,7 @@ def recover(D, gamma=None):
             warnings.warn("terminate after max. iter.", UserWarning)
             converged = True
 
-    return (A_hat, E_hat, k)
+    return (A_hat, E_hat, k, rank_est,non_zero)
 
 
 if __name__ == "__main__":
