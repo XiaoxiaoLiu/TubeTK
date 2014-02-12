@@ -1,0 +1,224 @@
+__license__ = "Apache License, Version 2.0"
+__author__  = "Xiaoxiao Liu, Kitware Inc., 2013"
+__status__  = "Development"
+
+import numpy as np # Numpy for general purpose processing
+import SimpleITK as sitk # SimpleITK to load images
+import sys
+import subprocess
+import os
+import matplotlib.pyplot as plt
+sys.path.append('../')
+import core.ialm as ialm
+import time
+
+
+####################################################
+# RPCA
+def rpca(Y,lamda):
+    t_begin = time.clock()
+
+    #Y = Y.astype(np.float32, copy=False)
+    gamma = lamda* np.sqrt(float(Y.shape[1])/Y.shape[0])
+    low_rank, sparse, n_iter,rank, sparsity = ialm.recover(Y,gamma)
+    #low_rank = low_rank.astype(np.float32, copy=False)
+    #sparse = sparse.astype(np.float32, copy=False)
+
+    t_end = time.clock()
+    t_elapsed = t_end- t_begin
+    print 'RPCA takes:%f seconds'%t_elapsed
+
+    return (low_rank, sparse, n_iter,rank, sparsity)
+
+
+#####################################################
+# show 2D slices in a subplot figure
+def showSlice(dataMatrix,title,color,subplotRow, im_ref, slice_nr = -1):
+    im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
+    z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
+    if slice_nr == -1:
+        slice_nr = z_dim/2
+    num_of_data = dataMatrix.shape[1]
+    for i  in range(num_of_data): 
+        plt.subplot2grid((3,num_of_data),(subplotRow,i))
+        im = np.array(dataMatrix[:,i]).reshape(z_dim,x_dim,y_dim)
+        implot = plt.imshow(im[slice_nr,:,:],color)
+        plt.title(title)
+        # plt.colorbar()
+    return
+
+# save 3D images from data matrix
+def saveImagesFromDM(dataMatrix,outputPrefix,im_ref): 
+    im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
+    z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
+    num_of_data = dataMatrix.shape[1]
+    for i in range(num_of_data):
+        im = np.array(dataMatrix[:,i]).reshape(z_dim,x_dim,y_dim)
+        img = sitk.GetImageFromArray(im)
+        img.SetOrigin(im_ref.GetOrigin())
+        img.SetSpacing(im_ref.GetSpacing())
+        img.SetDirection(im_ref.GetDirection())
+        fn = outputPrefix + str(i) + '.nrrd'
+        sitk.WriteImage(img,fn)
+    return
+
+
+######################  REGISTRATIONs ##############################
+
+# register to the reference image (normal control)
+def AffineReg(fixedIm,movingIm,outputIm):
+    executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSFit'
+    result_folder = os.path.dirname(movingIm)
+    arguments = ' --fixedVolume  ' + fixedIm \
+               +' --movingVolume ' + movingIm \
+               +' --outputVolume ' + outputIm \
+               +' --initializeTransformMode  useMomentsAlign --useAffine --numberOfSamples 100000   \
+                  --numberOfIterations 1500 --maskProcessingMode NOMASK --outputVolumePixelType float \
+                  --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear \
+                  --minimumStepLength 0.005 --translationScale 1000 --reproportionScale 1 --skewScale 1 \
+                  --maxBSplineDisplacement 0 --numberOfHistogramBins 50 --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 \
+--movingVolumeTimeIndex 0 --medianFilterSize 0,0,0 --removeIntensityOutliers 0 --useCachingOfBSplineWeightsMode ON \
+--useExplicitPDFDerivativesMode AUTO --ROIAutoDilateSize 0 --ROIAutoClosingSize 9 --relaxationFactor 0.5 --maximumStepLength 0.2 \
+--failureExitCode -1 --numberOfThreads -1 --forceMINumberOfThreads -1 --debugLevel 0 --costFunctionConvergenceFactor 1e+09 \
+--projectedGradientTolerance 1e-05 --costMetric MMI'
+    cmd = executable + ' ' + arguments
+    tempFile = open(result_folder+'/affine_reglog', 'w')
+    process = subprocess.Popen(cmd, stdout=tempFile, shell=True)
+    process.wait()
+    tempFile.close()
+    return
+
+# deformable image registration
+# call BrainsFit
+def DemonsReg(fixedIm,movingIm,outputIm, outputDVF,EXECUTE = False):
+    executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSDemonWarp'
+    result_folder = os.path.dirname(movingIm)
+    arguments = '--movingVolume ' +movingIm \
+    +' --fixedVolume ' + fixedIm \
+    +' --inputPixelType float ' \
+    +' --outputVolume ' + outputIm \
+    +' --outputDisplacementFieldVolume ' + outputDVF \
+    +' --outputPixelType float ' \
+    +' --interpolationMode Linear --registrationFilterType Demons \
+       --smoothDisplacementFieldSigma 1 --numberOfPyramidLevels 3 \
+       --minimumFixedPyramid 8,8,8 --minimumMovingPyramid 8,8,8 \
+       --arrayOfPyramidLevelIterations 300,50,30,20,15 \
+       --numberOfHistogramBins 256 --numberOfMatchPoints 2 --medianFilterSize 0,0,0 --maskProcessingMode NOMASK \
+--lowerThresholdForBOBF 0 --upperThresholdForBOBF 70 --backgroundFillValue 0 --seedForBOBF 0,0,0 \
+--neighborhoodForBOBF 1,1,1 --outputDisplacementFieldPrefix none --checkerboardPatternSubdivisions 4,4,4 \
+--gradient_type 0 --upFieldSmoothing 0 --max_step_length 2 --numberOfBCHApproximationTerms 2 --numberOfThreads -1'
+    cmd = executable + ' ' + arguments
+    if (EXECUTE):
+        tempFile = open(result_folder+'/demons.log', 'w')
+        process = subprocess.Popen(cmd, stdout=tempFile, shell=True)
+        process.wait()
+        tempFile.close()
+    return cmd
+
+# call BrainsFit
+def BSplineReg(fixedIm,movingIm,outputIm, outputTransform,gridSize =[12,12,8] , EXECUTE = False):
+    result_folder = os.path.dirname(movingIm)
+    string_gridSize = ','.join([str(gridSize[0]),str(gridSize[1]),str(gridSize[2])])
+    executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSFit'
+    arguments = ' --fixedVolume  ' + fixedIm \
+               +' --movingVolume ' + movingIm \
+               +' --outputVolume ' + outputIm \
+               +' --outputTransform ' + outputTransform \
+               +' --initializeTransformMode Off --useBSpline \
+                  --numberOfSamples 100000 --splineGridSize ' + string_gridSize \
+               +'  --numberOfIterations 1500 --maskProcessingMode NOMASK --outputVolumePixelType float --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear --minimumStepLength 0.005 --translationScale 1000 --reproportionScale 1 --skewScale 1 --maxBSplineDisplacement 0 --numberOfHistogramBins 50 --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 --movingVolumeTimeIndex 0 --medianFilterSize 0,0,0 --removeIntensityOutliers 0 --useCachingOfBSplineWeightsMode ON --useExplicitPDFDerivativesMode AUTO \
+                  --relaxationFactor 0.5 --maximumStepLength 0.2 --failureExitCode -1 --numberOfThreads -1 --forceMINumberOfThreads -1 --debugLevel 0 --costFunctionConvergenceFactor 1e+09 --projectedGradientTolerance 1e-05 \
+                  --costMetric MMI'
+
+    cmd = executable + ' ' + arguments
+    if (EXECUTE):
+        tempFile = open(result_folder+'/bspline.log', 'w')
+        process = subprocess.Popen(cmd, stdout=tempFile, shell=True)
+        process.wait()
+        tempFile.close()
+    return cmd
+
+
+def ConvertTransform(fixedIm, outputTransform,outputDVF,EXECUTE = False):
+    result_folder = os.path.dirname(outputDVF)
+    cmd ='/home/xiaoxiao/work/bin/Slicer/Slicer-build/lib/Slicer-4.3/cli-modules/BSplineToDeformationField' \
+       + ' --tfm '      + outputTransform \
+       + ' --refImage ' + fixedIm \
+       + ' --defImage ' + outputDVF
+    if (EXECUTE):
+        tempFile = open(result_folder+'/convertTransform.log', 'w')
+        process = subprocess.Popen(cmd, stdout=tempFile, shell=True)
+        process.wait()
+        tempFile.close()
+    return cmd
+
+def WarpImageMultiDVF(movingImage, refImage,DVFImageList, outputImage,EXECUTE = False):
+    result_folder = os.path.dirname(outputImage)
+    string_DVFImageList = ' '.join(DVFImageList)
+
+    cmd ='/home/xiaoxiao/work/bin/BRAINSTools/bin/WarpImageMultiTransform' \
+      +' 3 '    \
+      +'  ' + movingImage  \
+      +'  ' + outputImage \
+      +' -R  '   +  refImage \
+      +'  '  + string_DVFImageList
+
+
+    if (EXECUTE):
+        tempFile = open(result_folder+'/warpImageMultiDVF.log', 'w')
+        process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
+        process.wait()
+        tempFile.close()
+    return cmd
+
+def composeMultipleDVFs(refImage,DVFImageList, outputDVFImage,EXECUTE = False):
+    result_folder = os.path.dirname(outputDVFImage)
+    # T3(T2(T1(I))) = T3*T2*T1(I), need to reverse the sequence of the DVFs
+    string_DVFImageList = ' '.join(DVFImageList[::-1])
+
+    cmd ='/home/xiaoxiao/work/bin/BRAINSTools/bin/ComposeMultiTransform' \
+      +' 3 '    \
+      +'  ' + outputDVFImage  \
+      +' -R  '   +  refImage \
+      +'  '  + string_DVFImageList
+
+
+    if (EXECUTE):
+        tempFile = open(result_folder+'/composeDVF.log', 'w')
+        process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
+        process.wait()
+        tempFile.close()
+    return cmd
+
+def updateInputImageWithDVF(inputImage,refImage,DVFImage, newInputImage,EXECUTE = False):
+    result_folder = os.path.dirname(newInputImage)
+    cmd='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample' \
+      +' --inputVolume '    +  inputImage \
+      +' --referenceVolume '+  refImage   \
+      +' --outputVolume '   +  newInputImage\
+      +' --pixelType float ' \
+      +' --deformationVolume '  + DVFImage \
+      +' --defaultValue 0 --numberOfThreads -1 '
+    if (EXECUTE):
+        tempFile = open(result_folder+'/applyDVF.log', 'w')
+        process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
+        process.wait()
+        tempFile.close()
+    return cmd
+
+def updateInputImageWithTFM(inputImage,refImage, transform, newInputImage,EXECUTE = False):
+    result_folder = os.path.dirname(movingIm)
+    cmd='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample' \
+      +' --inputVolume '    +  inputImage \
+      +' --referenceVolume '+  refImage   \
+      +' --outputVolume '   +  newInputImage\
+      +' --pixelType float ' \
+      +' --warpTransform '  + transform \
+      +' --defaultValue 0 --numberOfThreads -1 '
+
+    if (EXECUTE):
+        tempFile = open(result_folder+'/applyTransform.log', 'w')
+        process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
+        process.wait()
+        tempFile.close()
+    return cmd
