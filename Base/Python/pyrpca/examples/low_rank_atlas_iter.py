@@ -43,7 +43,8 @@ def showSlice(dataMatrix,title,color,subplotRow, im_ref, slice_nr = -1):
         plt.subplot2grid((3,num_of_data),(subplotRow,i))
         im = np.array(dataMatrix[:,i]).reshape(z_dim,x_dim,y_dim)
         implot = plt.imshow(im[slice_nr,:,:],color)
-        plt.title(title)
+        plt.axis('off')
+        plt.title(title+' '+str(i))
         # plt.colorbar()
     return
 
@@ -116,7 +117,7 @@ def DemonsReg(fixedIm,movingIm,outputIm, outputDVF,EXECUTE = False):
     return cmd
 
 # call BrainsFit
-def BSplineReg(fixedIm,movingIm,outputIm, outputTransform,gridSize =[12,12,8] , EXECUTE = False):
+def BSplineReg(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6,6,4] , EXECUTE = False):
     result_folder = os.path.dirname(movingIm)
     string_gridSize = ','.join([str(gridSize[0]),str(gridSize[1]),str(gridSize[2])])
     executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSFit'
