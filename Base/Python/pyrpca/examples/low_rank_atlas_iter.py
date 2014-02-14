@@ -12,17 +12,28 @@ sys.path.append('../')
 import core.ialm as ialm
 import time
 
+###################################################
+# preprocessing
+def CropImage(inIm_name, outputIm_name, lowerCropSize, upperCropSize):
+    inIm = sitk.ReadImage(inIm_name)
+    crop = sitk.CropImageFilter()
+    crop.SetLowerBoundaryCropSize(lowerCropSize)
+    crop.SetUpperBoundaryCropSize(upperCropSize)
+    outIm = crop.Execute(inIm)
+    sitk.WriteImage(outIm,outputIm_name)
+    return
+
 
 ####################################################
 # RPCA
 def rpca(Y,lamda):
     t_begin = time.clock()
 
-    #Y = Y.astype(np.float32, copy=False)
+    Y = Y.astype(np.float32, copy=False)
     gamma = lamda* np.sqrt(float(Y.shape[1])/Y.shape[0])
     low_rank, sparse, n_iter,rank, sparsity = ialm.recover(Y,gamma)
-    #low_rank = low_rank.astype(np.float32, copy=False)
-    #sparse = sparse.astype(np.float32, copy=False)
+    low_rank = low_rank.astype(np.float32, copy=False)
+    sparse = sparse.astype(np.float32, copy=False)
 
     t_end = time.clock()
     t_elapsed = t_end- t_begin
@@ -33,13 +44,14 @@ def rpca(Y,lamda):
 
 #####################################################
 # show 2D slices in a subplot figure
-def showSlice(dataMatrix,title,color,subplotRow, im_ref, slice_nr = -1):
+def showSlice(dataMatrix,title,color,subplotRow, referenceImName, slice_nr = -1):
+    im_ref = sitk.ReadImage(referenceImName)
     im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
     z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
     if slice_nr == -1:
         slice_nr = z_dim/2
     num_of_data = dataMatrix.shape[1]
-    for i  in range(num_of_data): 
+    for i  in range(num_of_data):
         plt.subplot2grid((3,num_of_data),(subplotRow,i))
         im = np.array(dataMatrix[:,i]).reshape(z_dim,x_dim,y_dim)
         implot = plt.imshow(im[slice_nr,:,:],color)
@@ -49,7 +61,8 @@ def showSlice(dataMatrix,title,color,subplotRow, im_ref, slice_nr = -1):
     return
 
 # save 3D images from data matrix
-def saveImagesFromDM(dataMatrix,outputPrefix,im_ref): 
+def saveImagesFromDM(dataMatrix,outputPrefix,referenceImName):
+    im_ref = sitk.ReadImage(referenceImName)
     im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
     z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
     num_of_data = dataMatrix.shape[1]
