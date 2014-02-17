@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 sys.path.append('../')
 import core.ialm as ialm
 import time
+import nrrd
 
 ###################################################
 # preprocessing
@@ -58,6 +59,7 @@ def showSlice(dataMatrix,title,color,subplotRow, referenceImName, slice_nr = -1)
         plt.axis('off')
         plt.title(title+' '+str(i))
         # plt.colorbar()
+    del im_ref,im_ref_array
     return
 
 # save 3D images from data matrix
@@ -74,8 +76,45 @@ def saveImagesFromDM(dataMatrix,outputPrefix,referenceImName):
         img.SetDirection(im_ref.GetDirection())
         fn = outputPrefix + str(i) + '.nrrd'
         sitk.WriteImage(img,fn)
+    del im_ref,im_ref_array
     return
 
+
+def gridVisDVF(dvfImFileName,sliceNum = -1,titleString = 'DVF',saveFigPath ='.',deformedImFileName = None, contourNum=40):
+     dvfIm, options = nrrd.read(dvfImFileName)
+     dim,x_dim, y_dim,z_dim = dvfIm.shape
+     print 'dvf dims = '
+     print 'x ',x_dim
+     print 'y ',y_dim
+     print 'z ',z_dim
+     if sliceNum == -1:
+            sliceNum = z_dim/2
+     [gridX,gridY]=np.meshgrid(np.arange(1,x_dim+1),np.arange(1,y_dim+1))
+
+     fig = plt.figure()
+     if deformedImFileName :
+         bgGrayIm,options = nrrd.read(deformedImFileName)
+         print 'bgGrayIm.shape= ',bgGrayIm.shape
+         plt.imshow(np.transpose(bgGrayIm[:,:,sliceNum]),cmap=plt.cm.gray)
+
+     idMap = np.zeros((dvfIm.shape))
+     for x in range(dvfIm.shape[1]):
+        for y in range(dvfIm.shape[2]):
+            for z in range(dvfIm.shape[3]):
+                idMap[0,x,y,z] = x
+                idMap[1,x,y,z] = y
+                idMap[2,x,y,z] = z
+    # for composed DVF, sometimes it get really big  values?
+     overflow_values_indices = dvfIm > 10000
+     dvfIm[overflow_values_indices] = 0
+     mapIm = dvfIm + idMap
+
+     CS = plt.contour(gridX,gridY,np.transpose(mapIm[0,:,:,sliceNum]), contourNum, hold='on', colors='red')
+     CS = plt.contour(gridX,gridY,np.transpose(mapIm[1,:,:,sliceNum]), contourNum, hold='on', colors='red')
+     plt.title(titleString)
+     plt.savefig(saveFigPath + '/' + titleString)
+     plt.close(fig)
+     return
 
 ######################  REGISTRATIONs ##############################
 
