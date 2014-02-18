@@ -83,10 +83,6 @@ def saveImagesFromDM(dataMatrix,outputPrefix,referenceImName):
 def gridVisDVF(dvfImFileName,sliceNum = -1,titleString = 'DVF',saveFigPath ='.',deformedImFileName = None, contourNum=40):
      dvfIm, options = nrrd.read(dvfImFileName)
      dim,x_dim, y_dim,z_dim = dvfIm.shape
-     print 'dvf dims = '
-     print 'x ',x_dim
-     print 'y ',y_dim
-     print 'z ',z_dim
      if sliceNum == -1:
             sliceNum = z_dim/2
      [gridX,gridY]=np.meshgrid(np.arange(1,x_dim+1),np.arange(1,y_dim+1))
@@ -94,7 +90,6 @@ def gridVisDVF(dvfImFileName,sliceNum = -1,titleString = 'DVF',saveFigPath ='.',
      fig = plt.figure()
      if deformedImFileName :
          bgGrayIm,options = nrrd.read(deformedImFileName)
-         print 'bgGrayIm.shape= ',bgGrayIm.shape
          plt.imshow(np.transpose(bgGrayIm[:,:,sliceNum]),cmap=plt.cm.gray)
 
      idMap = np.zeros((dvfIm.shape))
@@ -114,6 +109,7 @@ def gridVisDVF(dvfImFileName,sliceNum = -1,titleString = 'DVF',saveFigPath ='.',
      plt.title(titleString)
      plt.savefig(saveFigPath + '/' + titleString)
      plt.close(fig)
+     del dvfIm, gridX, gridY,idMap,bgGrayIm,mapIm
      return
 
 ######################  REGISTRATIONs ##############################
@@ -152,7 +148,7 @@ def DemonsReg(fixedIm,movingIm,outputIm, outputDVF,EXECUTE = False):
     +' --outputVolume ' + outputIm \
     +' --outputDisplacementFieldVolume ' + outputDVF \
     +' --outputPixelType float ' \
-    +' --interpolationMode Linear --registrationFilterType Demons \
+    +' --interpolationMode Linear --registrationFilterType Diffeomorphic \
        --smoothDisplacementFieldSigma 1 --numberOfPyramidLevels 3 \
        --minimumFixedPyramid 8,8,8 --minimumMovingPyramid 8,8,8 \
        --arrayOfPyramidLevelIterations 300,50,30,20,15 \
