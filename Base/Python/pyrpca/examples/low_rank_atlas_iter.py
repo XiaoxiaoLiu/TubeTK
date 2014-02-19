@@ -12,6 +12,7 @@ sys.path.append('../')
 import core.ialm as ialm
 import time
 import nrrd
+import gc
 
 ###################################################
 # preprocessing
@@ -33,6 +34,7 @@ def rpca(Y,lamda):
     Y = Y.astype(np.float32, copy=False)
     gamma = lamda* np.sqrt(float(Y.shape[1])/Y.shape[0])
     low_rank, sparse, n_iter,rank, sparsity = ialm.recover(Y,gamma)
+    gc.collect()
     low_rank = low_rank.astype(np.float32, copy=False)
     sparse = sparse.astype(np.float32, copy=False)
 
@@ -108,6 +110,7 @@ def gridVisDVF(dvfImFileName,sliceNum = -1,titleString = 'DVF',saveFigPath ='.',
      CS = plt.contour(gridX,gridY,np.transpose(mapIm[1,:,:,sliceNum]), contourNum, hold='on', colors='red')
      plt.title(titleString)
      plt.savefig(saveFigPath + '/' + titleString)
+     fig.clf()
      plt.close(fig)
      del dvfIm, gridX, gridY,idMap,bgGrayIm,mapIm
      return
