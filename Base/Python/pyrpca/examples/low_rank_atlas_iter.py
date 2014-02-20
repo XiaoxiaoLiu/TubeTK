@@ -31,12 +31,9 @@ def CropImage(inIm_name, outputIm_name, lowerCropSize, upperCropSize):
 def rpca(Y,lamda):
     t_begin = time.clock()
 
-    Y = Y.astype(np.float32, copy=False)
     gamma = lamda* np.sqrt(float(Y.shape[1])/Y.shape[0])
     low_rank, sparse, n_iter,rank, sparsity = ialm.recover(Y,gamma)
     gc.collect()
-    low_rank = low_rank.astype(np.float32, copy=False)
-    sparse = sparse.astype(np.float32, copy=False)
 
     t_end = time.clock()
     t_elapsed = t_end- t_begin

@@ -36,6 +36,7 @@ def runIteration(Y,currentIter,lamda,gridSize):
 
     # Register low-rank images to the reference (healthy) image,
     # and update the input images to the next iteration
+    ps=[]
     for i in range(Y.shape[1]):
         movingIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_LowRank_' + str(i)  +'.nrrd'
         outputIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Deformed_LowRank' + str(i)  + '.nrrd'
@@ -65,8 +66,9 @@ def runIteration(Y,currentIter,lamda,gridSize):
         cmd = cmd1 + ";" + cmd2 + ";" +  cmd3 + ";" + cmd4
 
         process = subprocess.Popen(cmd, stdout = logFile, shell = True)
-        process.wait()
-        logFile.close()
+        ps.append(process)
+    for  p in ps:
+        p.wait()
     del low_rank, sparse
     return sparsity
 
@@ -159,7 +161,7 @@ def useData_BRATS2_Synthetic():
     data_folder +'/0025/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1010.mha'
     ]
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_GridSizeConstant'
 
     os.system('mkdir '+ result_folder)
     # data selection
@@ -218,13 +220,14 @@ def main():
     #useData_BRATS2()
     useData_BRATS2_Synthetic()
 
+    s = time.clock()
     # save script to the result folder for paramter checkups
     os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/Low_Rank_Atlas_Iter_BRATS.py   ' +result_folder)
 
     #showReferenceImage(reference_im_name)
     affineRegistrationStep()
 
-    sys.stdout = open(result_folder+'RUN.log', "w")
+    sys.stdout = open(result_folder+'/RUN.log', "w")
     im_ref = sitk.ReadImage(reference_im_name) # image in SITK format
     im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
     z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
@@ -238,11 +241,11 @@ def main():
     lamda = 1.0
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
-    gridSize = [3,5,3]
+    gridSize = [15,19,15]
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
-        s = time.clock()
+
         print 'Iteration ' +  str(iterCount) + ' lambda=%f'  %lamda
 
         # prepare data matrix
@@ -258,17 +261,19 @@ def main():
         gc.collect()
         # if lamda < 1.0:
         #  lamda = lamda + 0.1
-        gridSize = np.add(gridSize,[1,2,1])
+        #gridSize = np.add(gridSize,[1,2,1])
 
-        e = time.clock()
-        l = e - s
-        print 'Iteration' +str(iterCount)+ ' took:  %f mins to run'%(l/60.0)
+
 
         a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         print 'Current memory usage :',a/1024.0/1024.0,'GB'
 
         #h = hpy()
         #print h.heap()
+
+    e = time.clock()
+    l = e - s
+    print 'Total running time:  %f mins'%(l/60.0)
 
     # plot the sparsity curve
     plt.figure()
