@@ -1,5 +1,3 @@
-__license__ = "Apache License, Version 2.0"
-__author__  = "Xiaoxiao Liu, Kitware Inc., 2013"
 __status__  = "Development"
 
 import numpy as np # Numpy for general purpose processing
@@ -16,6 +14,14 @@ import gc
 
 ###################################################
 # preprocessing
+def AverageImages(listOfImages,outputIm):
+    executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/AverageImages'
+    arguments = ' 3 ' + outputIm +'  0  ' +  ' '.join(listOfImages)
+    cmd = executable + ' ' + arguments
+    process = subprocess.Popen(cmd,  shell=True)
+    process.wait()
+    return
+
 def CropImage(inIm_name, outputIm_name, lowerCropSize, upperCropSize):
     inIm = sitk.ReadImage(inIm_name)
     crop = sitk.CropImageFilter()
@@ -131,7 +137,7 @@ def AffineReg(fixedIm,movingIm,outputIm):
 --failureExitCode -1 --numberOfThreads -1 --forceMINumberOfThreads -1 --debugLevel 0 --costFunctionConvergenceFactor 1e+09 \
 --projectedGradientTolerance 1e-05 --costMetric MMI'
     cmd = executable + ' ' + arguments
-    tempFile = open(result_folder+'/affine_reglog', 'w')
+    tempFile = open(result_folder+'/affine_reg.log', 'w')
     process = subprocess.Popen(cmd, stdout=tempFile, shell=True)
     process.wait()
     tempFile.close()
