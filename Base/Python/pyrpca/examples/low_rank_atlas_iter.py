@@ -164,7 +164,7 @@ def DemonsReg(fixedIm,movingIm,outputIm, outputDVF,EXECUTE = False):
     return cmd
 
 # call BrainsFit
-def BSplineReg(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6,6,4] , EXECUTE = False):
+def BSplineReg_BRAINSFit(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6,6,4] , EXECUTE = False):
     result_folder = os.path.dirname(movingIm)
     string_gridSize = ','.join([str(gridSize[0]),str(gridSize[1]),str(gridSize[2])])
     executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSFit'
@@ -186,6 +186,25 @@ def BSplineReg(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6,6,4] , EX
         tempFile.close()
     return cmd
 
+
+def BSplineReg_Legacy(fixedIm,movingIm,outputIm, outputDVF, gridSize=5, EXECUTE = False):
+    result_folder = os.path.dirname(movingIm)
+    executable = '/home/xiaoxiao/work/bin/Slicer/Slicer-build/lib/Slicer-4.3/cli-modules/BSplineDeformableRegistration'
+    arguments = '  --iterations 100' \
+                 +' --gridSize ' + str(gridSize)  \
+                 +' --histogrambins 100 --spatialsamples 50000 --maximumDeformation 1  --default 0 '\
+                 +' --outputwarp ' + outputDVF \
+                 +' --resampledmovingfilename ' + outputIm \
+                 +' ' + fixedIm \
+                 +' ' + movingIm
+
+    cmd = executable + ' ' + arguments
+    if (EXECUTE):
+        tempFile = open(result_folder+'/bspline.log', 'w')
+        process = subprocess.Popen(cmd, stdout=tempFile, shell=True)
+        process.wait()
+        tempFile.close()
+    return cmd
 
 def ConvertTransform(fixedIm, outputTransform,outputDVF,EXECUTE = False):
     result_folder = os.path.dirname(outputDVF)

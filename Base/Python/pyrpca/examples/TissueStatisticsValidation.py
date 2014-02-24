@@ -93,7 +93,7 @@ def useData_BRATS2_Synthetic():
     data_folder +'/0025/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1010.mha'
     ]
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_w_0.8'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_20inputs'
 
     # data selection
     selection = [0,1,2,3,4,5,6,7]
@@ -146,7 +146,7 @@ def main():
     sys.stdout = open(result_folder+'/RUN_tissue_stats.log', "w")
 
     num_of_data = len(selection)
-    NUM_OF_ITERATIONS = 12
+    NUM_OF_ITERATIONS = 15
 
     # collect label statistics and save into txt files
     for inputNum in range(num_of_data):

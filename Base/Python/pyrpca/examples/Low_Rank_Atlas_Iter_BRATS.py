@@ -26,9 +26,9 @@ def runIteration(Y,currentIter,lamda,gridSize):
 
     # Visualize and inspect
     fig = plt.figure(figsize=(15,5))
-    showSlice(Y, 'Iter'+str(currentIter) +' Input',plt.cm.gray,0,reference_im_name)
-    showSlice(low_rank,'Iter'+str(currentIter) +' low rank',plt.cm.gray,1, reference_im_name)
-    showSlice(sparse,'Iter'+str(currentIter) +' sparse',plt.cm.gray,2, reference_im_name)
+    showSlice(Y, ' Input',plt.cm.gray,0,reference_im_name)
+    showSlice(low_rank,' low rank',plt.cm.gray,1, reference_im_name)
+    showSlice(sparse,' sparse',plt.cm.gray,2, reference_im_name)
     plt.savefig(result_folder+'/'+'Iter'+ str(currentIter)+'_w_'+str(lamda)+'.png')
     fig.clf()
     plt.close(fig)
@@ -49,21 +49,18 @@ def runIteration(Y,currentIter,lamda,gridSize):
         logFile = open(result_folder+'/Iter'+str(currentIter)+'_RUN_'+ str(i)+'.log', 'w')
 
         # pipe steps sequencially
-        cmd1 = BSplineReg(reference_im_name,movingIm,outputIm,outputTransform,gridSize)
+        cmd = BSplineReg_Legacy(reference_im_name,movingIm,outputIm,outputDVF,gridSize)
 
-        cmd2 = ConvertTransform(reference_im_name,outputTransform,outputDVF)
+        #cmd2 = ConvertTransform(reference_im_name,outputTransform,outputDVF)
 
         # compose deformations
         DVFImageList=[]
         for k in range(currentIter):
             DVFImageList.append(result_folder+'/'+ 'Iter'+ str(k+1)+'_DVF_' + str(i) +  '.nrrd')
-        cmd3 = composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
+        cmd += ";" + composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
 
-        cmd4 = updateInputImageWithDVF(initialInputImage,reference_im_name, \
+        cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
                                        outputComposedDVFIm,newInputImage)
-
-
-        cmd = cmd1 + ";" + cmd2 + ";" +  cmd3 + ";" + cmd4
 
         process = subprocess.Popen(cmd, stdout = logFile, shell = True)
         ps.append(process)
@@ -161,11 +158,12 @@ def useData_BRATS2_Synthetic():
     data_folder +'/0025/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1010.mha'
     ]
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_GridSizeConstant'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_LegacyReg_20inputs'
 
     os.system('mkdir '+ result_folder)
     # data selection
-    selection = [0,1,2,3,4,5,6,7]
+    #selection = [0,1,2,3,4,5,6,7]
+    selection = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
     reference_im_name = '/home/xiaoxiao/work/data/BRATS/SRI24/T1_Crop.nii.gz'
     return (data_folder,result_folder,im_names,selection,reference_im_name)
 
@@ -196,11 +194,11 @@ def useData_BRATS2():
     data_folder+'/HG/0026/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.794.mha',
     data_folder+'/HG/0027/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.800.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_Legacy'
     os.system('mkdir '+ result_folder)
     # data selection
-    selection = [0,1,2,3,4,5,6,7]
-    reference_im_name = '/home/xiaoxiao/work/data/BRATS/SRI24/T1_Crop.nii.gz'
+    selection = [0,1,2,3,4,5,6,7,8,9]
+    reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     return
 
 
@@ -217,8 +215,8 @@ def main():
     ##CropImage(data_folder +'/'+'SRI24/T1.nii.gz',data_folder +'/'+'SRI24/T1_Crop.nii.gz',[50,20,0],[50,30,0])
 
     #useData_BRATS_Challenge()
-    #useData_BRATS2()
-    useData_BRATS2_Synthetic()
+    useData_BRATS2()
+    #useData_BRATS2_Synthetic()
 
     s = time.clock()
     # save script to the result folder for paramter checkups
@@ -237,11 +235,11 @@ def main():
     num_of_data = len(selection)
 
 
-    NUM_OF_ITERATIONS = 12
-    lamda = 1.0
+    NUM_OF_ITERATIONS = 15
+    lamda = 0.7
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
-    gridSize = [15,19,15]
+    gridSize = 5 
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
@@ -256,13 +254,11 @@ def main():
             Y[:,i] = tmp.reshape(-1)
             del tmp
 
-
         sparsity[iterCount-1]= runIteration(Y, iterCount, lamda,gridSize)
         gc.collect()
         # if lamda < 1.0:
         #  lamda = lamda + 0.1
-        #gridSize = np.add(gridSize,[1,2,1])
-
+        gridSize = gridSize + 1 
 
 
         a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
