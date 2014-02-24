@@ -14,13 +14,6 @@ import gc
 
 ###################################################
 # preprocessing
-def AverageImages(listOfImages,outputIm):
-    executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/AverageImages'
-    arguments = ' 3 ' + outputIm +'  0  ' +  ' '.join(listOfImages)
-    cmd = executable + ' ' + arguments
-    process = subprocess.Popen(cmd,  shell=True)
-    process.wait()
-    return
 
 def CropImage(inIm_name, outputIm_name, lowerCropSize, upperCropSize):
     inIm = sitk.ReadImage(inIm_name)
@@ -277,3 +270,50 @@ def updateInputImageWithTFM(inputImage,refImage, transform, newInputImage,EXECUT
         process.wait()
         tempFile.close()
     return cmd
+
+def AverageImages(listOfImages,outputIm):
+    executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/AverageImages'
+    arguments = ' 3 ' + outputIm +'  0  ' +  ' '.join(listOfImages)
+    cmd = executable + ' ' + arguments
+    process = subprocess.Popen(cmd,  shell=True)
+    process.wait()
+    return
+
+
+def applyInverseDVFToTissue(DVFImage, inputTissueImage, refImage, outputTissueImage, EXECUTE=False):
+    result_folder = os.path.dirname(outputTissueImage)
+    cmd ='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample ' \
+      +' --inputVolume '    +  inputTissueImage \
+      +' --referenceVolume '+  refImage   \
+      +' --outputVolume '   +  outputTissueImage\
+      +' --pixelType short ' \
+      +' --inverseTransform  '\
+      +' --deformationVolume '  + DVFImage \
+      +' --defaultValue 0 --numberOfThreads -1 '
+    print cmd
+    if (EXECUTE):
+        tempFile = open(result_folder+'/applyDVFToTissue.log', 'w')
+        process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
+
+        process.wait()
+        tempFile.close()
+    return cmd
+
+def computeLabelStatistics(inputIm, labelmapIm):
+
+    inIm = sitk.ReadImage(inputIm)
+    labelIm = sitk.ReadImage(labelmapIm)
+
+    statsFilter = sitk.LabelStatisticsImageFilter()
+    statsFilter.Execute(inIm, labelIm)
+
+    numOfLabels = len(statsFilter.GetValidLabels())
+    stats = np.zeros((numOfLabels,5))
+    for i in range(numOfLabels):
+      stats[i,0] = statsFilter.GetMean(i)
+      stats[i,1] = statsFilter.GetSigma(i)
+      stats[i,2] = statsFilter.GetVariance(i)
+      stats[i,3] = statsFilter.GetMinimum(i)
+      stats[i,4] = statsFilter.GetMaximum(i)
+
+    return stats
