@@ -4,7 +4,7 @@
 # <codecell>
 
 import sys
-sys.path.append('./')
+sys.path.append('/home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples')
 from low_rank_atlas_iter import *
 
 # <codecell>
@@ -33,44 +33,50 @@ def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
     fig.clf()
     plt.close(fig)
 
+    num_of_data = Y.shape[1]
+    del low_rank, sparse,Y
 
+    print  'start image registrations'
     # Register low-rank images to the reference (healthy) image,
     # and update the input images to the next iteration
-    begin = time.clock()
     ps=[]
-    for i in range(Y.shape[1]):
+
+    for i in range(num_of_data):
         movingIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_LowRank_' + str(i)  +'.nrrd'
         outputIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Deformed_LowRank' + str(i)  + '.nrrd'
         outputTransform = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Transform_' + str(i) +  '.tfm'
         outputDVF = result_folder+'/'+ 'Iter'+ str(currentIter)+'_DVF_' + str(i) +  '.nrrd'
         previousInputImage = result_folder+'/Iter'+str(currentIter-1)+ '_T1_' + str(i)  + '.nrrd'
-        outputComposedDVFIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Composed_DVF_' + str(i) +  '.nrrd'
-        initialInputImage= result_folder+'/Iter0_T1_' +str(i) +  '.nrrd'
-        newInputImage = result_folder+'/Iter'+ str(currentIter)+'_T1_' +str(i) +  '.nrrd'
         logFile = open(result_folder+'/Iter'+str(currentIter)+'_RUN_'+ str(i)+'.log', 'w')
 
         # pipe steps sequencially
-        cmd = BSplineReg_Legacy(reference_im_name,movingIm,outputIm,outputDVF,gridSize, bsplineIterationNum)
+       # cmd = BSplineReg_Legacy(reference_im_name,movingIm,outputIm,outputDVF,gridSize, bsplineIterationNum)
+        cmd = BSplineReg_BRAINSFit(reference_im_name,movingIm,outputIm,outputTransform,gridSize)
 
-        #cmd2 = ConvertTransform(reference_im_name,outputTransform,outputDVF)
+        cmd +=';'+ ConvertTransform(reference_im_name,outputTransform,outputDVF)
+
+        outputComposedDVFIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Composed_DVF_' + str(i) +  '.nrrd'
+        initialInputImage= result_folder+'/Iter0_T1_' +str(i) +  '.nrrd'
+        newInputImage = result_folder+'/Iter'+ str(currentIter)+'_T1_' +str(i) +  '.nrrd'
 
         # compose deformations
         DVFImageList=[]
         for k in range(currentIter):
             DVFImageList.append(result_folder+'/'+ 'Iter'+ str(k+1)+'_DVF_' + str(i) +  '.nrrd')
-        cmd += ";" + composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
+
+        cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
 
         cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
                                        outputComposedDVFIm,newInputImage)
-
-        process = subprocess.Popen(cmd, stdout = logFile, shell = True)
+        process = subprocess.Popen(cmd, stdout=logFile, shell = True)
         ps.append(process)
+
+    count = 0
     for  p in ps:
         p.wait()
-    end = time.clock()
-    l = end - begin
-    print 'Bspline registration took:  %f mins'%(l/60.0)
-    del low_rank, sparse
+        count = count + 1
+        print  count, ' registration done'
+
     return sparsity
 
 
@@ -122,7 +128,7 @@ def useData_BRATS_Challenge():
      data_folder+'/HG/0309/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.17601.mha',
      data_folder+'/HG/0310/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.17605.mha']
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/Challenge/LRA_Results_T1_Legacy'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/Challenge/LRA_Results_T1_Legacy_w1.0'
     os.system('mkdir '+ result_folder)
 
     # data selection
@@ -227,7 +233,8 @@ def main():
     os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/Low_Rank_Atlas_Iter_BRATS.py   ' +result_folder)
 
     #showReferenceImage(reference_im_name)
-    affineRegistrationStep()
+    #affineRegistrationStep()
+
 
     # sys.stdout = open(result_folder+'/RUN.log', "w")
     im_ref = sitk.ReadImage(reference_im_name) # image in SITK format
@@ -240,16 +247,17 @@ def main():
 
 
     NUM_OF_ITERATIONS = 15
-    lamda = 0.7
+    lamda = 1.0
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
-    gridSize = 5
+    gridSize = [3,5,3]
     bsplineIterationNum = 20
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
 
         print 'Iteration ' +  str(iterCount) + ' lambda=%f'  %lamda
+        a = time.clock()
 
         # prepare data matrix
         for i in range(num_of_data) :
@@ -263,15 +271,18 @@ def main():
         gc.collect()
         # if lamda < 1.0:
         #  lamda = lamda + 0.1
-        gridSize = gridSize + 1
+        gridSize = np.add( gridSize,[1,2,1])
         bsplineIterationNum = bsplineIterationNum + 2
 
 
-        a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        print 'Current memory usage :',a/1024.0/1024.0,'GB'
+        #a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        #print 'Current memory usage :',a/1024.0/1024.0,'GB'
 
         #h = hpy()
         #print h.heap()
+        b = time.clock()
+        c = b-a
+        print 'Iteration took  %f mins'%(c/60.0)
 
     e = time.clock()
     l = e - s
