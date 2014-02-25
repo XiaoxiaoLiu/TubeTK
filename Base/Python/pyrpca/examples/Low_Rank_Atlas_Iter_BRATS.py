@@ -19,7 +19,7 @@ im_names =[]
 # <codecell>
 
 ###############################  the main pipeline #############################
-def runIteration(Y,currentIter,lamda,gridSize):
+def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
     low_rank, sparse, n_iter,rank, sparsity = rpca(Y,lamda)
     saveImagesFromDM(low_rank,result_folder+'/'+ 'Iter'+str(currentIter) +'_LowRank_', reference_im_name)
     saveImagesFromDM(sparse,result_folder+'/'+ 'Iter'+str(currentIter) +'_Sparse_', reference_im_name)
@@ -36,6 +36,7 @@ def runIteration(Y,currentIter,lamda,gridSize):
 
     # Register low-rank images to the reference (healthy) image,
     # and update the input images to the next iteration
+    begin = time.clock()
     ps=[]
     for i in range(Y.shape[1]):
         movingIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_LowRank_' + str(i)  +'.nrrd'
@@ -49,7 +50,7 @@ def runIteration(Y,currentIter,lamda,gridSize):
         logFile = open(result_folder+'/Iter'+str(currentIter)+'_RUN_'+ str(i)+'.log', 'w')
 
         # pipe steps sequencially
-        cmd = BSplineReg_Legacy(reference_im_name,movingIm,outputIm,outputDVF,gridSize)
+        cmd = BSplineReg_Legacy(reference_im_name,movingIm,outputIm,outputDVF,gridSize, bsplineIterationNum)
 
         #cmd2 = ConvertTransform(reference_im_name,outputTransform,outputDVF)
 
@@ -66,6 +67,9 @@ def runIteration(Y,currentIter,lamda,gridSize):
         ps.append(process)
     for  p in ps:
         p.wait()
+    end = time.clock()
+    l = end - begin
+    print 'Bspline registration took:  %f mins'%(l/60.0)
     del low_rank, sparse
     return sparsity
 
@@ -118,12 +122,12 @@ def useData_BRATS_Challenge():
      data_folder+'/HG/0309/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.17601.mha',
      data_folder+'/HG/0310/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.17605.mha']
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/Challenge/LRA_Results_T1'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/Challenge/LRA_Results_T1_Legacy'
     os.system('mkdir '+ result_folder)
 
     # data selection
     selection = [0,1,2,3,4,5,6,7]
-    reference_im_name = '/home/xiaoxiao/work/data/BRATS/SRI24/T1_Crop.nii.gz'
+    reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     return (data_folder,result_folder,im_names,selection,reference_im_name)
 
 def useData_BRATS2_Synthetic():
@@ -164,7 +168,7 @@ def useData_BRATS2_Synthetic():
     # data selection
     #selection = [0,1,2,3,4,5,6,7]
     selection = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
-    reference_im_name = '/home/xiaoxiao/work/data/BRATS/SRI24/T1_Crop.nii.gz'
+    reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     return (data_folder,result_folder,im_names,selection,reference_im_name)
 
 
@@ -214,8 +218,8 @@ def main():
 
     ##CropImage(data_folder +'/'+'SRI24/T1.nii.gz',data_folder +'/'+'SRI24/T1_Crop.nii.gz',[50,20,0],[50,30,0])
 
-    #useData_BRATS_Challenge()
-    useData_BRATS2()
+    useData_BRATS_Challenge()
+    #useData_BRATS2()
     #useData_BRATS2_Synthetic()
 
     s = time.clock()
@@ -225,7 +229,7 @@ def main():
     #showReferenceImage(reference_im_name)
     affineRegistrationStep()
 
-    sys.stdout = open(result_folder+'/RUN.log', "w")
+    # sys.stdout = open(result_folder+'/RUN.log', "w")
     im_ref = sitk.ReadImage(reference_im_name) # image in SITK format
     im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
     z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
@@ -239,7 +243,8 @@ def main():
     lamda = 0.7
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
-    gridSize = 5 
+    gridSize = 5
+    bsplineIterationNum = 20
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
@@ -254,11 +259,12 @@ def main():
             Y[:,i] = tmp.reshape(-1)
             del tmp
 
-        sparsity[iterCount-1]= runIteration(Y, iterCount, lamda,gridSize)
+        sparsity[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, bsplineIterationNum)
         gc.collect()
         # if lamda < 1.0:
         #  lamda = lamda + 0.1
-        gridSize = gridSize + 1 
+        gridSize = gridSize + 1
+        bsplineIterationNum = bsplineIterationNum + 2
 
 
         a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss

@@ -187,12 +187,12 @@ def BSplineReg_BRAINSFit(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6
     return cmd
 
 
-def BSplineReg_Legacy(fixedIm,movingIm,outputIm, outputDVF, gridSize=5, EXECUTE = False):
+def BSplineReg_Legacy(fixedIm,movingIm,outputIm, outputDVF, gridSize=5, iterationNum=20, EXECUTE = False):
     result_folder = os.path.dirname(movingIm)
     executable = '/home/xiaoxiao/work/bin/Slicer/Slicer-build/lib/Slicer-4.3/cli-modules/BSplineDeformableRegistration'
-    arguments = '  --iterations 100' \
+    arguments = '  --iterations ' + str(iterationNum)\
                  +' --gridSize ' + str(gridSize)  \
-                 +' --histogrambins 100 --spatialsamples 50000 --maximumDeformation 1  --default 0 '\
+                 +' --histogrambins 100 --spatialsamples 50000 '\
                  +' --outputwarp ' + outputDVF \
                  +' --resampledmovingfilename ' + outputIm \
                  +' ' + fixedIm \
