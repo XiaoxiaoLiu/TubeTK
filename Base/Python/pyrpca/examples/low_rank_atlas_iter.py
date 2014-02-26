@@ -324,6 +324,8 @@ def computeLabelStatistics(inputIm, labelmapIm):
 
     inIm = sitk.ReadImage(inputIm)
     labelIm = sitk.ReadImage(labelmapIm)
+    labelIm.SetOrigin(inIm.GetOrigin())
+    labelIm.SetDirection(inIm.GetDirection())
 
     statsFilter = sitk.LabelStatisticsImageFilter()
     statsFilter.Execute(inIm, labelIm)
