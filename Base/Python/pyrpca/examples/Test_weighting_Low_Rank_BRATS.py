@@ -19,63 +19,22 @@ im_names =[]
 # <codecell>
 
 ###############################  the main pipeline #############################
-def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
+def runIteration(Y,lamda):
     low_rank, sparse, n_iter,rank, sparsity = rpca(Y,lamda)
-    saveImagesFromDM(low_rank,result_folder+'/'+ 'Iter'+str(currentIter) +'_LowRank_', reference_im_name)
-    saveImagesFromDM(sparse,result_folder+'/'+ 'Iter'+str(currentIter) +'_Sparse_', reference_im_name)
+    saveImagesFromDM(low_rank,result_folder+'/LowRank_w'+str(lamda), reference_im_name)
+    saveImagesFromDM(sparse,result_folder+'/Sparse_w'+str(lamda), reference_im_name)
 
     # Visualize and inspect
     fig = plt.figure(figsize=(15,5))
     showSlice(Y, ' Input',plt.cm.gray,0,reference_im_name)
     showSlice(low_rank,' low rank',plt.cm.gray,1, reference_im_name)
     showSlice(sparse,' sparse',plt.cm.gray,2, reference_im_name)
-    plt.savefig(result_folder+'/'+'Iter'+ str(currentIter)+'_w_'+str(lamda)+'.png')
+    plt.savefig(result_folder+'/w_'+str(lamda)+'.png')
     fig.clf()
     plt.close(fig)
 
     num_of_data = Y.shape[1]
     del low_rank, sparse,Y
-
-    print  'start image registrations'
-    # Register low-rank images to the reference (healthy) image,
-    # and update the input images to the next iteration
-    ps=[]
-
-    for i in range(num_of_data):
-        movingIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_LowRank_' + str(i)  +'.nrrd'
-        outputIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Deformed_LowRank' + str(i)  + '.nrrd'
-        outputTransform = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Transform_' + str(i) +  '.tfm'
-        outputDVF = result_folder+'/'+ 'Iter'+ str(currentIter)+'_DVF_' + str(i) +  '.nrrd'
-        previousInputImage = result_folder+'/Iter'+str(currentIter-1)+ '_T1_' + str(i)  + '.nrrd'
-        logFile = open(result_folder+'/Iter'+str(currentIter)+'_RUN_'+ str(i)+'.log', 'w')
-
-        # pipe steps sequencially
-       # cmd = BSplineReg_Legacy(reference_im_name,movingIm,outputIm,outputDVF,gridSize, bsplineIterationNum)
-        cmd = BSplineReg_BRAINSFit(reference_im_name,movingIm,outputIm,outputTransform,gridSize)
-
-        cmd +=';'+ ConvertTransform(reference_im_name,outputTransform,outputDVF)
-
-        outputComposedDVFIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Composed_DVF_' + str(i) +  '.nrrd'
-        initialInputImage= result_folder+'/Iter0_T1_' +str(i) +  '.nrrd'
-        newInputImage = result_folder+'/Iter'+ str(currentIter)+'_T1_' +str(i) +  '.nrrd'
-
-        # compose deformations
-        DVFImageList=[]
-        for k in range(currentIter):
-            DVFImageList.append(result_folder+'/'+ 'Iter'+ str(k+1)+'_DVF_' + str(i) +  '.nrrd')
-
-        cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
-
-        cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
-                                       outputComposedDVFIm,newInputImage)
-        process = subprocess.Popen(cmd, stdout=logFile, shell = True)
-        ps.append(process)
-
-    count = 0
-    for  p in ps:
-        p.wait()
-        count = count + 1
-        print  count, ' registration done'
 
     return sparsity
 
@@ -168,7 +127,7 @@ def useData_BRATS2_Synthetic():
     data_folder +'/0025/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1010.mha'
     ]
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_20inputs_w0.5'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_20inputs_w0.7'
 
     os.system('mkdir '+ result_folder)
     # data selection
@@ -204,7 +163,7 @@ def useData_BRATS2():
     data_folder+'/HG/0026/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.794.mha',
     data_folder+'/HG/0027/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.800.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.8'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_Test_Weighting'
     os.system('mkdir '+ result_folder)
     # data selection
     selection = [0,1,2,3,4,5,6,7,8,9]
@@ -225,82 +184,52 @@ def main():
     ##CropImage(data_folder +'/'+'SRI24/T1.nii.gz',data_folder +'/'+'SRI24/T1_Crop.nii.gz',[50,20,0],[50,30,0])
 
     #useData_BRATS_Challenge()
-    #useData_BRATS2()
-    useData_BRATS2_Synthetic()
+    useData_BRATS2()
+    #useData_BRATS2_Synthetic()
 
     s = time.clock()
     # save script to the result folder for paramter checkups
-    os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/Low_Rank_Atlas_Iter_BRATS.py   ' +result_folder)
+    os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/Test_weighting_Low_Rank_BRATS.py    ' +result_folder)
 
     #showReferenceImage(reference_im_name)
     affineRegistrationStep()
-
-
-    sys.stdout = open(result_folder+'/RUN.log', "w")
     im_ref = sitk.ReadImage(reference_im_name) # image in SITK format
     im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
     z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
     vector_length = z_dim * x_dim * y_dim
     del im_ref, im_ref_array
 
+   # sys.stdout = open(result_folder+'/TestWeighting_RUN.log', "w")
     num_of_data = len(selection)
 
 
-    NUM_OF_ITERATIONS = 15
+    NUM_OF_ITERATIONS = 5
     lamda = 0.5
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
-    gridSize = [3,5,3]
-    bsplineIterationNum = 20
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
-
-
-        print 'Iteration ' +  str(iterCount) + ' lambda=%f'  %lamda
-        a = time.clock()
+        print ' lambda=%f'  %lamda
 
         # prepare data matrix
         for i in range(num_of_data) :
-            im_file =  result_folder+'/'+ 'Iter'+str(iterCount-1)+'_T1_' + str(i)  + '.nrrd'
+            im_file =  result_folder+'/'+ 'Iter'+str(0)+'_T1_' + str(i)  + '.nrrd'
             tmp = sitk.ReadImage(im_file)
             tmp = sitk.GetArrayFromImage(tmp)
             Y[:,i] = tmp.reshape(-1)
             del tmp
 
-        sparsity[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, bsplineIterationNum)
+        sparsity[iterCount-1] = runIteration(Y, lamda)
+
         gc.collect()
-        # if lamda < 1.0:
-        #  lamda = lamda + 0.1
-        gridSize = np.add( gridSize,[1,2,1])
-        bsplineIterationNum = bsplineIterationNum + 2
+        lamda = lamda + 0.1
 
-
-        #a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        #print 'Current memory usage :',a/1024.0/1024.0,'GB'
-
-        #h = hpy()
-        #print h.heap()
-        b = time.clock()
-        c = b-a
-        print 'Iteration took  %f mins'%(c/60.0)
-
-    e = time.clock()
-    l = e - s
-    print 'Total running time:  %f mins'%(l/60.0)
 
     # plot the sparsity curve
     plt.figure()
     plt.plot(range(NUM_OF_ITERATIONS), sparsity)
-    plt.savefig(result_folder+'/sparsity.png')
+    plt.savefig(result_folder+'/test_weighting_sparsity.png')
 
-
-    #visulaize
-    for i in range(num_of_data):
-       for currentIter in range(1,NUM_OF_ITERATIONS):
-            outputComposedDVFIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_DVF_' + str(i) +  '.nrrd'
-            deformedInputIm = result_folder+'/'+ 'Iter'+ str(currentIter+1)+'_T1_' + str(i) +  '.nrrd'
-            gridVisDVF(outputComposedDVFIm,z_dim/2,'DVF_Vis_T1_'+str(i) +'_Iter'+str(currentIter+1),\
-                       result_folder,deformedInputIm,20)
 
 
 
