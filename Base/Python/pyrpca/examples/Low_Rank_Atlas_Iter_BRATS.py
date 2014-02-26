@@ -168,7 +168,7 @@ def useData_BRATS2_Synthetic():
     data_folder +'/0025/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1010.mha'
     ]
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_LegacyReg_20inputs'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_20inputs_w0.7'
 
     os.system('mkdir '+ result_folder)
     # data selection
@@ -204,7 +204,7 @@ def useData_BRATS2():
     data_folder+'/HG/0026/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.794.mha',
     data_folder+'/HG/0027/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.800.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_Legacy'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.8'
     os.system('mkdir '+ result_folder)
     # data selection
     selection = [0,1,2,3,4,5,6,7,8,9]
@@ -224,8 +224,8 @@ def main():
 
     ##CropImage(data_folder +'/'+'SRI24/T1.nii.gz',data_folder +'/'+'SRI24/T1_Crop.nii.gz',[50,20,0],[50,30,0])
 
-    useData_BRATS_Challenge()
-    #useData_BRATS2()
+    #useData_BRATS_Challenge()
+    useData_BRATS2()
     #useData_BRATS2_Synthetic()
 
     s = time.clock()
@@ -233,10 +233,10 @@ def main():
     os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/Low_Rank_Atlas_Iter_BRATS.py   ' +result_folder)
 
     #showReferenceImage(reference_im_name)
-    #affineRegistrationStep()
+    affineRegistrationStep()
 
 
-    # sys.stdout = open(result_folder+'/RUN.log', "w")
+    sys.stdout = open(result_folder+'/RUN.log', "w")
     im_ref = sitk.ReadImage(reference_im_name) # image in SITK format
     im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
     z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
@@ -247,7 +247,7 @@ def main():
 
 
     NUM_OF_ITERATIONS = 15
-    lamda = 1.0
+    lamda = 0.8
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
     gridSize = [3,5,3]

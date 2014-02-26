@@ -299,12 +299,13 @@ def AverageImages(listOfImages,outputIm):
     return
 
 
-def applyInverseDVFToTissue(DVFImage, inputTissueImage, refImage, outputTissueImage, EXECUTE=False):
+def applyInverseDVFToTissue(DVFImage, inputTissueImage, outputTissueImage, EXECUTE=False):
     result_folder = os.path.dirname(outputTissueImage)
+    reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     cmd ='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample ' \
       +' --inputVolume '    +  inputTissueImage \
-      +' --referenceVolume '+  refImage   \
-      +' --outputVolume '   +  outputTissueImage\
+      +' --outputVolume '   +  outputTissueImage \
+      +' --referenceVolume '   +  reference_im_name\
       +' --pixelType short ' \
       +' --inverseTransform  '\
       +' --deformationVolume '  + DVFImage \
