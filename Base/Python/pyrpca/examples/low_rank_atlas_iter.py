@@ -124,7 +124,7 @@ def AffineReg(fixedIm,movingIm,outputIm):
                   --numberOfIterations 1500 --maskProcessingMode NOMASK --outputVolumePixelType float \
                   --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear \
                   --minimumStepLength 0.005 --translationScale 1000 --reproportionScale 1 --skewScale 1 \
-                  --maxBSplineDisplacement 0 --numberOfHistogramBins 50 --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 \
+                  --maxBSplineDisplacement   0 --numberOfHistogramBins 50 --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 \
 --movingVolumeTimeIndex 0 --medianFilterSize 0,0,0 --removeIntensityOutliers 0 --useCachingOfBSplineWeightsMode ON \
 --useExplicitPDFDerivativesMode AUTO --ROIAutoDilateSize 0 --ROIAutoClosingSize 9 --relaxationFactor 0.5 --maximumStepLength 0.2 \
 --failureExitCode -1 --numberOfThreads -1 --forceMINumberOfThreads -1 --debugLevel 0 --costFunctionConvergenceFactor 1e+09 \
@@ -164,7 +164,7 @@ def DemonsReg(fixedIm,movingIm,outputIm, outputDVF,EXECUTE = False):
     return cmd
 
 # call BrainsFit
-def BSplineReg_BRAINSFit(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6,6,4] , EXECUTE = False):
+def BSplineReg_BRAINSFit(fixedIm,movingIm,outputIm, outputTransform,gridSize =[5,5,5] ,maxDisp = 5.0 , EXECUTE = False):
     result_folder = os.path.dirname(movingIm)
     string_gridSize = ','.join([str(gridSize[0]),str(gridSize[1]),str(gridSize[2])])
     executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSFit'
@@ -173,9 +173,9 @@ def BSplineReg_BRAINSFit(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6
                +' --outputVolume ' + outputIm \
                +' --outputTransform ' + outputTransform \
                +' --initializeTransformMode Off --useBSpline \
-                  --numberOfSamples 100000 --splineGridSize ' + string_gridSize \
-               +' --numberOfHistogramBins 50'\
-               +'  --numberOfIterations 500 --maskProcessingMode NOMASK --outputVolumePixelType float --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear --minimumStepLength 0.005 --translationScale 1000 --reproportionScale 1 --skewScale 1 --maxBSplineDisplacement 0  --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 --movingVolumeTimeIndex 0 --medianFilterSize 0,0,0 --removeIntensityOutliers 0 --useCachingOfBSplineWeightsMode ON --useExplicitPDFDerivativesMode AUTO \
+                  --numberOfSamples 50000 --splineGridSize ' + string_gridSize \
+               +' --maxBSplineDisplacement  ' +str(maxDisp)\
+               +' --numberOfHistogramBins 50 -numberOfIterations 500 --maskProcessingMode NOMASK --outputVolumePixelType float --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear --minimumStepLength 0.005 --translationScale 1000 --reproportionScale 1 --skewScale 1   --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 --movingVolumeTimeIndex 0 --medianFilterSize 0,0,0 --removeIntensityOutliers 0 --useCachingOfBSplineWeightsMode ON --useExplicitPDFDerivativesMode AUTO \
                   --relaxationFactor 0.5 --maximumStepLength 0.2 --failureExitCode -1 --numberOfThreads -1 --forceMINumberOfThreads -1 --debugLevel 0 --costFunctionConvergenceFactor 1e+09 --projectedGradientTolerance 1e-05 \
                   --costMetric MMI'
 

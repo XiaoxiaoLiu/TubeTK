@@ -19,7 +19,7 @@ im_names =[]
 # <codecell>
 
 ###############################  the main pipeline #############################
-def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
+def runIteration(Y,currentIter,lamda,gridSize,maxDisp):
     low_rank, sparse, n_iter,rank, sparsity, sum_sparse = rpca(Y,lamda)
     saveImagesFromDM(low_rank,result_folder+'/'+ 'Iter'+str(currentIter) +'_LowRank_', reference_im_name)
     saveImagesFromDM(sparse,result_folder+'/'+ 'Iter'+str(currentIter) +'_Sparse_', reference_im_name)
@@ -50,8 +50,7 @@ def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
         logFile = open(result_folder+'/Iter'+str(currentIter)+'_RUN_'+ str(i)+'.log', 'w')
 
         # pipe steps sequencially
-       # cmd = BSplineReg_Legacy(reference_im_name,movingIm,outputIm,outputDVF,gridSize, bsplineIterationNum)
-        cmd = BSplineReg_BRAINSFit(reference_im_name,movingIm,outputIm,outputTransform,gridSize)
+        cmd = BSplineReg_BRAINSFit(reference_im_name,movingIm,outputIm,outputTransform,gridSize, maxDisp)
 
         cmd +=';'+ ConvertTransform(reference_im_name,outputTransform,outputDVF)
 
@@ -68,9 +67,8 @@ def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
 
               cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
 
-       # cmd += ";" + updateInputImageWithDVF(previousInputImage,reference_im_name, \
         cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
-                                       outputDVF,newInputImage)
+                                       outputComposedDVFIm,newInputImage)
         process = subprocess.Popen(cmd, stdout=logFile, shell = True)
         ps.append(process)
 
@@ -204,10 +202,10 @@ def useData_BRATS2():
     data_folder+'/HG/0026/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.794.mha',
     data_folder+'/HG/0027/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.800.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_20inputs_T1_w0.5'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w0.5'
     os.system('mkdir '+ result_folder)
     # data selection
-    selection = range(20)
+    selection = range(8)
     reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     return
 
@@ -236,7 +234,7 @@ def main():
     affineRegistrationStep()
 
 
-    sys.stdout = open(result_folder+'/RUN.log', "w")
+    #sys.stdout = open(result_folder+'/RUN.log', "w")
     im_ref = sitk.ReadImage(reference_im_name) # image in SITK format
     im_ref_array = sitk.GetArrayFromImage(im_ref) # get numpy array
     z_dim, x_dim, y_dim = im_ref_array.shape # get 3D volume shape
@@ -251,14 +249,14 @@ def main():
     sparsity = np.zeros(NUM_OF_ITERATIONS)
     sum_sparse = np.zeros(NUM_OF_ITERATIONS)
 
-    gridSize = [3,5,3]
-    bsplineIterationNum = 20
+    gridSize = [6,8,6]
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
-
+        maxDisp = z_dim/gridSize[2]/4
         print 'Iteration ' +  str(iterCount) + ' lambda=%f'  %lamda
         print 'Grid size: ', gridSize
+        print 'Max Displacement: ', maxDisp 
         a = time.clock()
 
         # prepare data matrix
@@ -269,13 +267,11 @@ def main():
             Y[:,i] = tmp.reshape(-1)
             del tmp
 
-        sparsity[iterCount-1], sum_sparse[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, bsplineIterationNum)
+        sparsity[iterCount-1], sum_sparse[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, maxDisp)
         gc.collect()
-        if gridSize[0] < 10:
-            gridSize = np.add( gridSize,[1,2,1])
-
-    bsplineIterationNum = bsplineIterationNum + 2
-
+        if iterCount%2 == 0 :
+          if gridSize[0] < 10:
+            gridSize = np.add( gridSize,[1,1,1])
 
         #a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         #print 'Current memory usage :',a/1024.0/1024.0,'GB'
