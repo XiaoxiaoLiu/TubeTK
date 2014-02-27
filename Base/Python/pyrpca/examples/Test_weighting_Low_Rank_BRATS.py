@@ -163,10 +163,10 @@ def useData_BRATS2():
     data_folder+'/HG/0026/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.794.mha',
     data_folder+'/HG/0027/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.800.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_Test_Weighting'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_20inputs_T1_Test_Weighting'
     os.system('mkdir '+ result_folder)
     # data selection
-    selection = [0,1,2,3,4,5,6,7,8,9]
+    selection = range(20)
     reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     return
 
@@ -203,8 +203,8 @@ def main():
     num_of_data = len(selection)
 
 
-    NUM_OF_ITERATIONS = 5
-    lamda = 0.5
+    NUM_OF_ITERATIONS = 4
+    lamda = 0.4
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
     Y = np.zeros((vector_length,num_of_data))
@@ -222,7 +222,7 @@ def main():
         sparsity[iterCount-1] = runIteration(Y, lamda)
 
         gc.collect()
-        lamda = lamda + 0.1
+        lamda = lamda + 0.2
 
 
     # plot the sparsity curve

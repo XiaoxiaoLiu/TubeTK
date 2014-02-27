@@ -20,7 +20,7 @@ im_names =[]
 
 ###############################  the main pipeline #############################
 def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
-    low_rank, sparse, n_iter,rank, sparsity = rpca(Y,lamda)
+    low_rank, sparse, n_iter,rank, sparsity, sum_sparse = rpca(Y,lamda)
     saveImagesFromDM(low_rank,result_folder+'/'+ 'Iter'+str(currentIter) +'_LowRank_', reference_im_name)
     saveImagesFromDM(sparse,result_folder+'/'+ 'Iter'+str(currentIter) +'_Sparse_', reference_im_name)
 
@@ -68,7 +68,7 @@ def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
 
               cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
 
-        #cmd += ";" + updateInputImageWithDVF(previousInputImage,reference_im_name, \
+       # cmd += ";" + updateInputImageWithDVF(previousInputImage,reference_im_name, \
         cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
                                        outputDVF,newInputImage)
         process = subprocess.Popen(cmd, stdout=logFile, shell = True)
@@ -77,7 +77,7 @@ def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
     for  p in ps:
         p.wait()
 
-    return sparsity
+    return sparsity, sum_sparse
 
 
 def showReferenceImage(reference_im_name):
@@ -204,10 +204,10 @@ def useData_BRATS2():
     data_folder+'/HG/0026/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.794.mha',
     data_folder+'/HG/0027/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.800.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.4_0.8'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_20inputs_T1_w0.5'
     os.system('mkdir '+ result_folder)
     # data selection
-    selection = [0,1,2,3,4,5,6,7]
+    selection = range(20)
     reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     return
 
@@ -249,6 +249,7 @@ def main():
     NUM_OF_ITERATIONS = 15
     lamda = 0.5
     sparsity = np.zeros(NUM_OF_ITERATIONS)
+    sum_sparse = np.zeros(NUM_OF_ITERATIONS)
 
     gridSize = [3,5,3]
     bsplineIterationNum = 20
@@ -257,6 +258,7 @@ def main():
 
 
         print 'Iteration ' +  str(iterCount) + ' lambda=%f'  %lamda
+        print 'Grid size: ', gridSize
         a = time.clock()
 
         # prepare data matrix
@@ -267,12 +269,12 @@ def main():
             Y[:,i] = tmp.reshape(-1)
             del tmp
 
-        sparsity[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, bsplineIterationNum)
+        sparsity[iterCount-1], sum_sparse[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, bsplineIterationNum)
         gc.collect()
-        lamda = lamda + 0.025
         if gridSize[0] < 10:
-          gridSize = np.add( gridSize,[1,2,1])
-        bsplineIterationNum = bsplineIterationNum + 2
+            gridSize = np.add( gridSize,[1,2,1])
+
+    bsplineIterationNum = bsplineIterationNum + 2
 
 
         #a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
@@ -292,8 +294,12 @@ def main():
     plt.figure()
     plt.plot(range(NUM_OF_ITERATIONS), sparsity)
     plt.savefig(result_folder+'/sparsity.png')
+    
 
 
+    plt.figure()
+    plt.plot(range(NUM_OF_ITERATIONS), sum_sparse)
+    plt.savefig(result_folder+'/sumSparse.png')
 
 
 

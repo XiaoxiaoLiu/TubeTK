@@ -31,14 +31,14 @@ def rpca(Y,lamda):
     t_begin = time.clock()
 
     gamma = lamda* np.sqrt(float(Y.shape[1])/Y.shape[0])
-    low_rank, sparse, n_iter,rank, sparsity = ialm.recover(Y,gamma)
+    low_rank, sparse, n_iter,rank, sparsity, sumSparse= ialm.recover(Y,gamma)
     gc.collect()
 
     t_end = time.clock()
     t_elapsed = t_end- t_begin
     print 'RPCA takes:%f seconds'%t_elapsed
 
-    return (low_rank, sparse, n_iter,rank, sparsity)
+    return (low_rank, sparse, n_iter,rank, sparsity, sumSparse)
 
 
 #####################################################

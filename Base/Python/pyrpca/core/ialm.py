@@ -162,8 +162,9 @@ def recover(D, gamma=None):
         if k % 10 == 0:
             rank_est = np.linalg.matrix_rank(A_hat)
             non_zero = len(np.where(np.asarray(np.abs(E_hat)).ravel()>0)[0])
-            print ("[iter: %.4d]: rank(P) = %.4d, |C|_0 = %.4d, crit=%.10f" %
-                    (k, rank_est, non_zero, conv_crit))
+            abs_sum_sparse =np.sum(np.abs(E_hat)) 
+            print ("[iter: %.4d]: rank(P) = %.4d, |C|_0 = %.4d, crit=%.10f, total sparse =%.4d" %
+                    (k, rank_est, non_zero, conv_crit,abs_sum_sparse))
 
         # handle non-convergence
         k = k+1
@@ -171,7 +172,7 @@ def recover(D, gamma=None):
             warnings.warn("terminate after max. iter.", UserWarning)
             converged = True
 
-    return (A_hat, E_hat, k, rank_est,non_zero)
+    return (A_hat, E_hat, k, rank_est,non_zero, abs_sum_sparse)
 
 
 if __name__ == "__main__":
