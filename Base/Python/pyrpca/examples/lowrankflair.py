@@ -163,7 +163,7 @@ def useData_BRATS2():
 '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/HG/0026/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.793.mha',
 '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/HG/0027/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.799.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_FLAIR_w0.5'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_FLAIR_w0.7'
     os.system('mkdir '+ result_folder)
     # data selection
     selection = [0,1,2,3,4,5,6,7,8,9]
@@ -205,7 +205,7 @@ def main():
 
 
     NUM_OF_ITERATIONS = 15
-    lamda = 0.5
+    lamda = 0.7
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
     gridSize = [3,5,3]

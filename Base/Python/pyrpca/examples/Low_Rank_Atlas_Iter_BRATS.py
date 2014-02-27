@@ -60,14 +60,17 @@ def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
         newInputImage = result_folder+'/Iter'+ str(currentIter)+'_T1_' +str(i) +  '.nrrd'
 
         # compose deformations
-        DVFImageList=[]
-        for k in range(currentIter):
-            DVFImageList.append(result_folder+'/'+ 'Iter'+ str(k+1)+'_DVF_' + str(i) +  '.nrrd')
+        COMPOSE_DVF = False
+        if COMPOSE_DVF:
+		DVFImageList=[]
+		for k in range(currentIter):
+		    DVFImageList.append(result_folder+'/'+ 'Iter'+ str(k+1)+'_DVF_' + str(i) +  '.nrrd')
 
-        cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
+		cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
 
-        cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
-                                       outputComposedDVFIm,newInputImage)
+        #cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
+        cmd += ";" + updateInputImageWithDVF(previousInputImage,reference_im_name, \
+                                       outputDVF,newInputImage)
         process = subprocess.Popen(cmd, stdout=logFile, shell = True)
         ps.append(process)
 
@@ -168,7 +171,7 @@ def useData_BRATS2_Synthetic():
     data_folder +'/0025/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1010.mha'
     ]
 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_20inputs_w0.5'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_20inputs_greedyIm'
 
     os.system('mkdir '+ result_folder)
     # data selection
@@ -247,7 +250,7 @@ def main():
 
 
     NUM_OF_ITERATIONS = 15
-    lamda = 0.5
+    lamda = 0.7
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
     gridSize = [3,5,3]
