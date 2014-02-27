@@ -175,7 +175,7 @@ def BSplineReg_BRAINSFit(fixedIm,movingIm,outputIm, outputTransform,gridSize =[6
                +' --initializeTransformMode Off --useBSpline \
                   --numberOfSamples 100000 --splineGridSize ' + string_gridSize \
                +' --numberOfHistogramBins 50'\
-               +'  --numberOfIterations 1500 --maskProcessingMode NOMASK --outputVolumePixelType float --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear --minimumStepLength 0.005 --translationScale 1000 --reproportionScale 1 --skewScale 1 --maxBSplineDisplacement 0  --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 --movingVolumeTimeIndex 0 --medianFilterSize 0,0,0 --removeIntensityOutliers 0 --useCachingOfBSplineWeightsMode ON --useExplicitPDFDerivativesMode AUTO \
+               +'  --numberOfIterations 500 --maskProcessingMode NOMASK --outputVolumePixelType float --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear --minimumStepLength 0.005 --translationScale 1000 --reproportionScale 1 --skewScale 1 --maxBSplineDisplacement 0  --numberOfMatchPoints 10 --fixedVolumeTimeIndex 0 --movingVolumeTimeIndex 0 --medianFilterSize 0,0,0 --removeIntensityOutliers 0 --useCachingOfBSplineWeightsMode ON --useExplicitPDFDerivativesMode AUTO \
                   --relaxationFactor 0.5 --maximumStepLength 0.2 --failureExitCode -1 --numberOfThreads -1 --forceMINumberOfThreads -1 --debugLevel 0 --costFunctionConvergenceFactor 1e+09 --projectedGradientTolerance 1e-05 \
                   --costMetric MMI'
 

@@ -39,8 +39,8 @@ def collectStatstics(InputNum, NUM_OF_ITERATIONS):
 def main():
 
     global result_folder, NUM_OF_ITERATIONS, num_of_data 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/LRA_Results_T1_20inputs_w0.5'
-    num_of_data = 20
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.7'
+    num_of_data = 8
     NUM_OF_ITERATIONS = 15
 
     # save script to the result folder for paramter checkups

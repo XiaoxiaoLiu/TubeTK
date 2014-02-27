@@ -60,25 +60,22 @@ def runIteration(Y,currentIter,lamda,gridSize,bsplineIterationNum):
         newInputImage = result_folder+'/Iter'+ str(currentIter)+'_T1_' +str(i) +  '.nrrd'
 
         # compose deformations
-        COMPOSE_DVF = False
+        COMPOSE_DVF = True
         if COMPOSE_DVF:
-		DVFImageList=[]
-		for k in range(currentIter):
-		    DVFImageList.append(result_folder+'/'+ 'Iter'+ str(k+1)+'_DVF_' + str(i) +  '.nrrd')
+          DVFImageList=[]
+          for k in range(currentIter):
+              DVFImageList.append(result_folder+'/'+ 'Iter'+ str(k+1)+'_DVF_' + str(i) +  '.nrrd')
 
-		cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
+              cmd += ';'+ composeMultipleDVFs(reference_im_name,DVFImageList,outputComposedDVFIm)
 
-        #cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
-        cmd += ";" + updateInputImageWithDVF(previousInputImage,reference_im_name, \
+        #cmd += ";" + updateInputImageWithDVF(previousInputImage,reference_im_name, \
+        cmd += ";" + updateInputImageWithDVF(initialInputImage,reference_im_name, \
                                        outputDVF,newInputImage)
         process = subprocess.Popen(cmd, stdout=logFile, shell = True)
         ps.append(process)
 
-    count = 0
     for  p in ps:
         p.wait()
-        count = count + 1
-        print  count, ' registration done'
 
     return sparsity
 
@@ -207,10 +204,10 @@ def useData_BRATS2():
     data_folder+'/HG/0026/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.794.mha',
     data_folder+'/HG/0027/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.800.mha'
     ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.8'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.4_0.8'
     os.system('mkdir '+ result_folder)
     # data selection
-    selection = [0,1,2,3,4,5,6,7,8,9]
+    selection = [0,1,2,3,4,5,6,7]
     reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     return
 
@@ -228,8 +225,8 @@ def main():
     ##CropImage(data_folder +'/'+'SRI24/T1.nii.gz',data_folder +'/'+'SRI24/T1_Crop.nii.gz',[50,20,0],[50,30,0])
 
     #useData_BRATS_Challenge()
-    #useData_BRATS2()
-    useData_BRATS2_Synthetic()
+    useData_BRATS2()
+   # useData_BRATS2_Synthetic()
 
     s = time.clock()
     # save script to the result folder for paramter checkups
@@ -250,7 +247,7 @@ def main():
 
 
     NUM_OF_ITERATIONS = 15
-    lamda = 0.7
+    lamda = 0.5
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
     gridSize = [3,5,3]
@@ -272,9 +269,9 @@ def main():
 
         sparsity[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, bsplineIterationNum)
         gc.collect()
-        # if lamda < 1.0:
-        #  lamda = lamda + 0.1
-        gridSize = np.add( gridSize,[1,2,1])
+        lamda = lamda + 0.025
+        if gridSize[0] < 10:
+          gridSize = np.add( gridSize,[1,2,1])
         bsplineIterationNum = bsplineIterationNum + 2
 
 
