@@ -21,6 +21,8 @@ def CropImage(inIm_name, outputIm_name, lowerCropSize, upperCropSize):
     crop.SetLowerBoundaryCropSize(lowerCropSize)
     crop.SetUpperBoundaryCropSize(upperCropSize)
     outIm = crop.Execute(inIm)
+    outIm.SetOrigin(inIm.GetOrigin())
+    outIm.SetDirection(inIm.GetDirection())
     sitk.WriteImage(outIm,outputIm_name)
     return
 

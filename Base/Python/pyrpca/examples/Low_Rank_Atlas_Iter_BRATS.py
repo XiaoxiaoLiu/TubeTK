@@ -179,18 +179,17 @@ reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
 
 lamda = 0.7
 
-gridSize=[10,12,10]
-#useData_BRATS2()
-#selection = range(8)
-#result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_grid10_w'+str(lamda)
-
-
-
-useData_BRATS2_Synthetic()
-result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/RegulateBSpline_w'+str(lamda)
+useData_BRATS2()
 selection = range(8)
+result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w'+str(lamda)
 
-os.system('mkdir '+ result_folder)
+
+
+#useData_BRATS2_Synthetic()
+#result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/RegulateBSpline_w'+str(lamda)
+#selection = range(8)
+
+#os.system('mkdir '+ result_folder)
 
 #@profile
 def main():
@@ -221,7 +220,7 @@ def main():
     sparsity = np.zeros(NUM_OF_ITERATIONS)
     sum_sparse = np.zeros(NUM_OF_ITERATIONS)
 
-    #gridSize = [6,8,6]
+    gridSize = [6,8,6]
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
@@ -242,9 +241,9 @@ def main():
         sparsity[iterCount-1], sum_sparse[iterCount-1] = runIteration(Y, iterCount, lamda,gridSize, maxDisp)
         #lamda += 0.025
         gc.collect()
-#        if iterCount%2 == 0 :
- #         if gridSize[0] < 10:
-  #          gridSize = np.add( gridSize,[1,1,1])
+        if iterCount%2 == 0 :
+          if gridSize[0] < 10:
+            gridSize = np.add( gridSize,[1,1,1])
 
         #a = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         #print 'Current memory usage :',a/1024.0/1024.0,'GB'

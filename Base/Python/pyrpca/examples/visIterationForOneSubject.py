@@ -4,15 +4,14 @@ from low_rank_atlas_iter import *
 
 
 result_folder ='/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w0.7'
-outputPNGFolder = '/mnt/kitwarenas2/share/Projects/LowRankAtlas/results/BRATS2-Patient-8inputs_w0.7'
+outputPNGFolder = '/mnt/kitwarenas2/share/Projects/LowRankAtlas/results/RegulateBspline_w0.7'
 outputPNGFolder = result_folder
 os.system('mkdir '+outputPNGFolder)
-inputNumber = 5
 madality = 'T1'
-NUM_OF_ITERATIONS = 14
+NUM_OF_ITERATIONS = 10
 
 
-def showIteraionSlices(typename, row, numList):
+def showIteraionSlices(typename, row, numList, t):
      ii = 0
      for i in numList:
           inputIm = result_folder+'/'+ 'Iter'+ str(i)+'_'+typename+'_' + str(inputNumber) +  '.nrrd'
@@ -24,16 +23,16 @@ def showIteraionSlices(typename, row, numList):
           ii = ii + 1
 	  implot = plt.imshow(np.flipud(im_array[z_dim/2,:,:]),plt.cm.gray)
           plt.axis('off')
-          plt.title('Iter'+str(ii) +' '+typename)
+          plt.title('Iter'+str(ii) +' '+t)
 
 
 
 #for inputNumber in [5,18]:
 for inputNumber in range(8):
      fig = plt.figure(figsize=(15,5))
-     showIteraionSlices('T1',0, range(0,NUM_OF_ITERATIONS)) #iteraion i's input image is output of iter(i-!)
-     showIteraionSlices('LowRank',1, range(1,NUM_OF_ITERATIONS+1))
-     showIteraionSlices('Sparse',2,range(1,NUM_OF_ITERATIONS+1))
+     showIteraionSlices('T1',0, range(0,NUM_OF_ITERATIONS),'D') #iteraion i's input image is output of iter(i-!)
+     showIteraionSlices('LowRank',1, range(1,NUM_OF_ITERATIONS+1),'L')
+     showIteraionSlices('Sparse',2,range(1,NUM_OF_ITERATIONS+1),'S')
  
      plt.savefig(outputPNGFolder+'/'+'Input'+str(inputNumber) +'All'+str(NUM_OF_ITERATIONS)+'Iterations.png')
      fig.clf()
