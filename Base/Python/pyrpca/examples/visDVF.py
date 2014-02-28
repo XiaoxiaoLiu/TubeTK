@@ -3,8 +3,8 @@ sys.path.append('/home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples')
 from low_rank_atlas_iter import *
 
 
-result_folder ='/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.7' 
-outputPNGFolder = '/home/xiaoxiao/work/result/BRATS2-Patient-8inputs_w0.7'
+result_folder ='/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w0.7' 
+outputPNGFolder = result_folder
 inputNumber = 0
 slicerNum = 77
 madality = 'T1'
