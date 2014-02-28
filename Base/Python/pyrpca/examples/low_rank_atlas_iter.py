@@ -53,7 +53,7 @@ def showSlice(dataMatrix,title,color,subplotRow, referenceImName, slice_nr = -1)
     for i  in range(num_of_data):
         plt.subplot2grid((3,num_of_data),(subplotRow,i))
         im = np.array(dataMatrix[:,i]).reshape(z_dim,x_dim,y_dim)
-        implot = plt.imshow(im[slice_nr,:,:],color)
+        implot = plt.imshow(np.flipud(im[slice_nr,:,:]),color)
         plt.axis('off')
         plt.title(title+' '+str(i))
         # plt.colorbar()
@@ -175,7 +175,7 @@ def BSplineReg_BRAINSFit(fixedIm,movingIm,outputIm, outputTransform,gridSize =[5
                +' --initializeTransformMode Off --useBSpline \
                   --numberOfSamples 50000 --splineGridSize ' + string_gridSize \
                +' --maxBSplineDisplacement  ' +str(maxDisp)\
-               +' --numberOfHistogramBins 50 -numberOfIterations 500 --maskProcessingMode NOMASK --outputVolumePixelType float --backgroundFillValue 0   --numberOfThreads -1 --costMetric MMI'
+               +' --numberOfHistogramBins 50  --numberOfIterations 500 --maskProcessingMode NOMASK --outputVolumePixelType float --backgroundFillValue 0   --numberOfThreads -1 --costMetric MMI'
 
     cmd = executable + ' ' + arguments
     if (EXECUTE):
