@@ -27,8 +27,7 @@ def showIteraionSlices(typename, row, numList, t):
 
 
 
-#for inputNumber in [5,18]:
-for inputNumber in range(8):
+for inputNumber in [0]:
      fig = plt.figure(figsize=(15,5))
      showIteraionSlices('T1',0, range(0,NUM_OF_ITERATIONS),'D') #iteraion i's input image is output of iter(i-!)
      showIteraionSlices('LowRank',1, range(1,NUM_OF_ITERATIONS+1),'L')

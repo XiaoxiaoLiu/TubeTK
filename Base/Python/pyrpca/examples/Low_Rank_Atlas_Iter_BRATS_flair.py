@@ -36,38 +36,36 @@ def useData_BRATS2_FLAIR():
     return
 
 # Data info
-def useData_BRATS2_Synthetic():
+def useData_BRATS2_Synthetic_flair():
     global data_folder,result_folder,im_names,selection,reference_im_name
     data_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG'
     im_names = [ \
-    data_folder +'/0001/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.866.mha',
-    data_folder +'/0002/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.872.mha',
-    data_folder +'/0003/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.878.mha',
-    data_folder +'/0004/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.884.mha',
-    data_folder +'/0005/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.890.mha',
-    data_folder +'/0006/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.896.mha',
-    data_folder +'/0007/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.902.mha',
-    data_folder +'/0008/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.908.mha',
-    data_folder +'/0009/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.914.mha',
-    data_folder +'/0010/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.920.mha',
-    data_folder +'/0011/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.926.mha',
-    data_folder +'/0012/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.932.mha',
-    data_folder +'/0013/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.938.mha',
-    data_folder +'/0014/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.944.mha',
-    data_folder +'/0015/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.950.mha',
-    data_folder +'/0016/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.956.mha',
-    data_folder +'/0017/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.962.mha',
-    data_folder +'/0018/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.968.mha',
-    data_folder +'/0019/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.974.mha',
-    data_folder +'/0020/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.980.mha',
-    data_folder +'/0021/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.986.mha',
-    data_folder +'/0022/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.992.mha',
-    data_folder +'/0023/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.998.mha',
-    data_folder +'/0024/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1004.mha',
-    data_folder +'/0025/VSD.Brain.XX.O.MR_T1/VSD.Brain.XX.O.MR_T1.1010.mha'
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0001/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.865.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0002/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.871.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0003/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.877.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0004/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.883.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0005/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.889.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0006/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.895.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0007/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.901.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0008/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.907.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0009/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.913.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0010/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.919.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0011/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.925.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0012/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.931.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0013/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.937.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0014/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.943.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0015/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.949.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0016/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.955.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0017/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.961.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0018/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.967.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0019/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.973.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0020/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.979.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0021/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.985.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0022/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.991.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0023/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.997.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0024/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.1003.mha',
+'/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/HG/0025/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.1009.mha'
     ]
-
-
 
     return 
 
@@ -134,7 +132,7 @@ def runIteration(Y,currentIter,lamda,gridSize,maxDisp):
         outputIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Deformed_LowRank' + str(i)  + '.nrrd'
         outputTransform = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Transform_' + str(i) +  '.tfm'
         outputDVF = result_folder+'/'+ 'Iter'+ str(currentIter)+'_DVF_' + str(i) +  '.nrrd'
-        previousInputImage = result_folder+'/Iter'+str(currentIter-1)+ '_T1_' + str(i)  + '.nrrd'
+        previousInputImage = result_folder+'/Iter'+str(currentIter-1)+ '_Flair_' + str(i)  + '.nrrd'
         logFile = open(result_folder+'/Iter'+str(currentIter)+'_RUN_'+ str(i)+'.log', 'w')
 
         # pipe steps sequencially
@@ -143,8 +141,8 @@ def runIteration(Y,currentIter,lamda,gridSize,maxDisp):
         cmd +=';'+ ConvertTransform(reference_im_name,outputTransform,outputDVF)
 
         outputComposedDVFIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Composed_DVF_' + str(i) +  '.nrrd'
-        initialInputImage= result_folder+'/Iter0_T1_' +str(i) +  '.nrrd'
-        newInputImage = result_folder+'/Iter'+ str(currentIter)+'_T1_' +str(i) +  '.nrrd'
+        initialInputImage= result_folder+'/Iter0_Flair_' +str(i) +  '.nrrd'
+        newInputImage = result_folder+'/Iter'+ str(currentIter)+'_Flair_' +str(i) +  '.nrrd'
 
         # compose deformations
         COMPOSE_DVF = True
@@ -190,7 +188,7 @@ def showReferenceImage(reference_im_name):
 def affineRegistrationStep():
     num_of_data = len(selection)
     for i in range(num_of_data):
-        outputIm =  result_folder+'/Iter0_T1_' + str(i)  + '.nrrd'
+        outputIm =  result_folder+'/Iter0_Flair_' + str(i)  + '.nrrd'
         AffineReg(reference_im_name,im_names[selection[i]],outputIm)
     return
 
@@ -203,19 +201,23 @@ im_names =[]
 reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
 ######  set data folders
 
-lamda = 0.9
+lamda = 0.7
 
-useData_BRATS2()
-selection = range(8)
-result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w'+str(lamda)
-
-
-
-#useData_BRATS2_Synthetic()
-#result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/RegulateBSpline_w'+str(lamda)
+#useData_BRATS2()
 #selection = range(8)
+#result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_grid10_w'+str(lamda)
 
-#os.system('mkdir '+ result_folder)
+
+
+useData_BRATS2_FLAIR()
+result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/Flair_w'+str(lamda)
+selection = [0,1,3,4,6,7,9,10]
+
+#useData_BRATS2_Synthetic_flair()
+#result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/Flair_w'+str(lamda)
+#selection =range(8) 
+
+os.system('mkdir '+ result_folder)
 
 #@profile
 def main():
@@ -226,7 +228,7 @@ def main():
 
     s = time.clock()
     # save script to the result folder for paramter checkups
-    os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/Low_Rank_Atlas_Iter_BRATS.py   ' +result_folder)
+    os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/Low_Rank_Atlas_Iter_BRATS_flair.py   ' +result_folder)
 
     #showReferenceImage(reference_im_name)
     affineRegistrationStep()
@@ -258,7 +260,7 @@ def main():
 
         # prepare data matrix
         for i in range(num_of_data) :
-            im_file =  result_folder+'/'+ 'Iter'+str(iterCount-1)+'_T1_' + str(i)  + '.nrrd'
+            im_file =  result_folder+'/'+ 'Iter'+str(iterCount-1)+'_Flair_' + str(i)  + '.nrrd'
             tmp = sitk.ReadImage(im_file)
             tmp = sitk.GetArrayFromImage(tmp)
             Y[:,i] = tmp.reshape(-1)

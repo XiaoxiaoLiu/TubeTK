@@ -39,7 +39,8 @@ def collectStatstics(InputNum, NUM_OF_ITERATIONS):
 def main():
 
     global result_folder, NUM_OF_ITERATIONS, num_of_data 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w0.7'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_grid10_w0.7'
+
     num_of_data = 8
     NUM_OF_ITERATIONS = 10
 
@@ -48,7 +49,7 @@ def main():
     #sys.stdout = open(result_folder+'/RUN_tissue_stats.log', "w")
 
     # collect label statistics and save into txt files
-    CALCULATE = False
+    CALCULATE = True 
     if CALCULATE:
       for inputNum in range(num_of_data):
          # a list of stats matrix ( numOfLables  *  5)
@@ -78,7 +79,7 @@ def main():
     #plotAllStats(num_of_data,NUM_OF_ITERATIONS,3,'MIN')
     #plotAllStats(num_of_data,NUM_OF_ITERATIONS,4,'MAX')
 
-    # plotAllStats_Seperate(num_of_data,NUM_OF_ITERATIONS,1,'STD')
+    #plotAllStats_Seperate(num_of_data,NUM_OF_ITERATIONS,1,'STD')
     return
 
 def plotAllStats_Seperate(num_of_data,NUM_OF_ITERATIONS,metricInx,metricType):
