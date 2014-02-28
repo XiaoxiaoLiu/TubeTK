@@ -4,7 +4,7 @@ from low_rank_atlas_iter import *
 
 
 result_folder ='/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w0.7'
-#outputPNGFolder = '/mnt/kitwarenas2/share/Projects/LowRankAtlas/results/BRATS2-Patient-8inputs_w0.7'
+outputPNGFolder = '/mnt/kitwarenas2/share/Projects/LowRankAtlas/results/BRATS2-Patient-8inputs_w0.7'
 outputPNGFolder = result_folder
 os.system('mkdir '+outputPNGFolder)
 inputNumber = 5
