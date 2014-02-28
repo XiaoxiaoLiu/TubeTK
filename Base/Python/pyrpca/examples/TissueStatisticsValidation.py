@@ -39,16 +39,17 @@ def collectStatstics(InputNum, NUM_OF_ITERATIONS):
 def main():
 
     global result_folder, NUM_OF_ITERATIONS, num_of_data 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w0.7'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_grid10_w0.7'
+
     num_of_data = 8
-    NUM_OF_ITERATIONS = 14
+    NUM_OF_ITERATIONS = 15
 
     # save script to the result folder for paramter checkups
     os.system('cp /home/xiaoxiao/work/src/TubeTK/Base/Python/pyrpca/examples/TissueStatisticsValidation.py   ' +result_folder)
     #sys.stdout = open(result_folder+'/RUN_tissue_stats.log', "w")
 
     # collect label statistics and save into txt files
-    CALCULATE = False
+    CALCULATE = True 
     if CALCULATE:
       for inputNum in range(num_of_data):
          # a list of stats matrix ( numOfLables  *  5)
@@ -72,13 +73,13 @@ def main():
               f.close()
 
     # plot population label statistics 
-    #plotAllStats(num_of_data,NUM_OF_ITERATIONS,1,'STD')
+    plotAllStats(num_of_data,NUM_OF_ITERATIONS,1,'STD')
     #plotAllStats(num_of_data,NUM_OF_ITERATIONS,2,'VAR')
     #plotAllStats(num_of_data,NUM_OF_ITERATIONS,0,'MEAN')
     #plotAllStats(num_of_data,NUM_OF_ITERATIONS,3,'MIN')
     #plotAllStats(num_of_data,NUM_OF_ITERATIONS,4,'MAX')
 
-    plotAllStats_Seperate(num_of_data,NUM_OF_ITERATIONS,1,'STD')
+    #plotAllStats_Seperate(num_of_data,NUM_OF_ITERATIONS,1,'STD')
     return
 
 def plotAllStats_Seperate(num_of_data,NUM_OF_ITERATIONS,metricInx,metricType):
