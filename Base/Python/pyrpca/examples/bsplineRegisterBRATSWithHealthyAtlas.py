@@ -32,7 +32,9 @@ for i in range(num_of_data):
     process = subprocess.Popen(cmd, stdout=logFile, shell = True) 
     process.wait()
 
-    stats = computeLabelStatistics(outputIm,tissues_Image)
+    tumorMaskImage= '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/TumorMask/affine3more_' +str(InputNum) +  '.nrrd'
+    deformedTumorMaskImage= '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/TumorMask/bspline_deformed_3more_' +str(InputNum) +  '.nrrd'
+    stats = computeLabelStatistics(outputIm, tissues_Image, deformedTumorMaskImage)
     metricInx =1
     CSF[i] = stats[1,metricInx]
     WM[i] = stats[2,metricInx]
