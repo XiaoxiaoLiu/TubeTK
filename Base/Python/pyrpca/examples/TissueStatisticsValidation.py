@@ -13,6 +13,7 @@ selection = []
 im_names =[]
 tissues_Image =  '/home/xiaoxiao/work/data/SRI24/tissues_crop.nrrd'
 
+
 #CropImage('/home/xiaoxiao/work/data/SRI24/tissues.nrrd',tissues_Image,[50,20,0],[50,30,0])
 
 ###############################  the main pipeline #############################
@@ -20,7 +21,8 @@ def collectStatstics(InputNum, NUM_OF_ITERATIONS):
     allStats = [ ]
     for currentIter in range(1,NUM_OF_ITERATIONS+1):
         outputComposedDVFIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Composed_DVF_' + str(InputNum) +  '.nrrd'
-        inputImage = result_folder+'/Iter'+ str(currentIter)+'_T1_' +str(InputNum) +  '.nrrd'
+        inputImage = result_folder+'/Iter'+ str(currentIter)+'_Flair_' +str(InputNum) +  '.nrrd'
+        tumorMaskImage= '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/TumorMask/affine3more_' +str(InputNum) +  '.nrrd'
 
         #outputTissueImage = result_folder+'/tissues_'+str(InputNum) + '_Iter'+ str(currentIter) +  '.nrrd'
         logFile = open(result_folder+'/Iter'+str(currentIter)+'_TissueStats_'+ str(InputNum)+'.log', 'w')
@@ -28,7 +30,7 @@ def collectStatstics(InputNum, NUM_OF_ITERATIONS):
         #applyInverseDVFToTissue(outputComposedDVFIm, tissues_Image, outputTissueImage, True)
 
         # stats is a matrix of the statistics, including four metrics: mean, std, var,min, max
-        stats = computeLabelStatistics(inputImage,tissues_Image)
+        stats = computeLabelStatistics(inputImage, tissues_Image, tumorMaskImage)
 
         allStats.append(stats)
 
@@ -39,7 +41,7 @@ def collectStatstics(InputNum, NUM_OF_ITERATIONS):
 def main():
 
     global result_folder, NUM_OF_ITERATIONS, num_of_data 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_grid10_w0.7'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/Flair_w0.8'
 
     num_of_data = 8
     NUM_OF_ITERATIONS = 10

@@ -116,12 +116,15 @@ def gridVisDVF(dvfImFileName,sliceNum = -1,titleString = 'DVF',saveFigPath ='.',
 ######################  REGISTRATIONs ##############################
 
 # register to the reference image (normal control)
-def AffineReg(fixedIm,movingIm,outputIm):
+def AffineReg(fixedIm,movingIm,outputIm, outputTransform = None):
+    if not outputTransform:
+       outputTransform = outputIm+'.tfm'
     executable = '/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSFit'
     result_folder = os.path.dirname(movingIm)
     arguments = ' --fixedVolume  ' + fixedIm \
                +' --movingVolume ' + movingIm \
                +' --outputVolume ' + outputIm \
+               +' --linearTransform ' + outputTransform \
                +' --initializeTransformMode  useMomentsAlign --useAffine --numberOfSamples 100000   \
                   --numberOfIterations 1500 --maskProcessingMode NOMASK --outputVolumePixelType float \
                   --backgroundFillValue 0 --maskInferiorCutOffFromCenter 1000 --interpolationMode Linear \
@@ -258,6 +261,22 @@ def composeMultipleDVFs(refImage,DVFImageList, outputDVFImage,EXECUTE = False):
         tempFile.close()
     return cmd
 
+def applyLinearTransform(inputImage,refImage,transform, newInputImage,EXECUTE = False):
+    result_folder = os.path.dirname(newInputImage)
+    cmd='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample' \
+      +' --inputVolume '    +  inputImage \
+      +' --referenceVolume '+  refImage   \
+      +' --outputVolume '   +  newInputImage\
+      +' --pixelType float ' \
+      +' --warpTransform '  + transform \
+      +' --defaultValue 0 --numberOfThreads -1 '
+    if (EXECUTE):
+        tempFile = open(result_folder+'/applyLinearTransform.log', 'w')
+        process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
+        process.wait()
+        tempFile.close()
+    return cmd
+
 def updateInputImageWithDVF(inputImage,refImage,DVFImage, newInputImage,EXECUTE = False):
     result_folder = os.path.dirname(newInputImage)
     cmd='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample' \
@@ -320,15 +339,26 @@ def applyInverseDVFToTissue(DVFImage, inputTissueImage, outputTissueImage, EXECU
         tempFile.close()
     return cmd
 
-def computeLabelStatistics(inputIm, labelmapIm):
+def computeLabelStatistics(inputIm, labelmapIm, tumorMaskImage = None):
 
     inIm = sitk.ReadImage(inputIm)
     labelIm = sitk.ReadImage(labelmapIm)
     labelIm.SetOrigin(inIm.GetOrigin())
     labelIm.SetDirection(inIm.GetDirection())
+    maskedLabelIm = labelIm
+
+    if tumorMaskImage :
+        maskImage = sitk.ReadImage(tumorMaskImage)
+        mask = sitk.MaskNegatedImageFilter()
+        maskImage.SetOrigin(labelIm.GetOrigin())
+        maskImage.SetDirection(labelIm.GetDirection())
+        thre = sitk.BinaryThresholdImageFilter()
+        thre.SetLowerThreshold(0.5)
+        thMaskImage = thre.Execute(maskImage)
+        maskedLabelIm = mask.Execute(labelIm, thMaskImage)
 
     statsFilter = sitk.LabelStatisticsImageFilter()
-    statsFilter.Execute(inIm, labelIm)
+    statsFilter.Execute(inIm, maskedLabelIm)
 
     numOfLabels = len(statsFilter.GetValidLabels())
     stats = np.zeros((numOfLabels,5))
