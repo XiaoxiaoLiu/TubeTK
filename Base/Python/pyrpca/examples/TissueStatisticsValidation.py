@@ -23,14 +23,15 @@ def collectStatstics(InputNum, NUM_OF_ITERATIONS):
         outputComposedDVFIm = result_folder+'/'+ 'Iter'+ str(currentIter)+'_Composed_DVF_' + str(InputNum) +  '.nrrd'
         inputImage = result_folder+'/Iter'+ str(currentIter)+'_Flair_' +str(InputNum) +  '.nrrd'
         tumorMaskImage= '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/TumorMask/affine3more_' +str(InputNum) +  '.nrrd'
+        deformedTumorMaskImage= '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/TumorMask/deformed_3more_' +str(InputNum) +  '.nrrd'
 
         #outputTissueImage = result_folder+'/tissues_'+str(InputNum) + '_Iter'+ str(currentIter) +  '.nrrd'
         logFile = open(result_folder+'/Iter'+str(currentIter)+'_TissueStats_'+ str(InputNum)+'.log', 'w')
 
-        #applyInverseDVFToTissue(outputComposedDVFIm, tissues_Image, outputTissueImage, True)
+        updateInputImageWithDVF(tumorMaskImage,tumorMaskImage,outputComposedDVFIm, deformedTumorMaskImage,True)
 
         # stats is a matrix of the statistics, including four metrics: mean, std, var,min, max
-        stats = computeLabelStatistics(inputImage, tissues_Image, tumorMaskImage)
+        stats = computeLabelStatistics(inputImage, tissues_Image, deformedTumorMaskImage)
 
         allStats.append(stats)
 
