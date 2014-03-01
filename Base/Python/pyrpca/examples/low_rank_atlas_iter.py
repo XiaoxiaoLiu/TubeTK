@@ -55,7 +55,7 @@ def showSlice(dataMatrix,title,color,subplotRow, referenceImName, slice_nr = -1)
     for i  in range(num_of_data):
         plt.subplot2grid((3,num_of_data),(subplotRow,i))
         im = np.array(dataMatrix[:,i]).reshape(z_dim,x_dim,y_dim)
-        implot = plt.imshow(np.flipud(im[slice_nr,:,:]),color)
+        implot = plt.imshow(np.fliplr(np.flipud(im[slice_nr,:,:])),color)
         plt.axis('off')
         plt.title(title+' '+str(i))
         # plt.colorbar()
