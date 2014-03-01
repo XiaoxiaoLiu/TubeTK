@@ -6,8 +6,9 @@ from low_rank_atlas_iter import *
 
 reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
 tissues_Image =  '/home/xiaoxiao/work/data/SRI24/tissues_crop.nrrd'
-data_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/bsplineRegToSRI'
+data_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/flair_bsplineRegToSRI'
 
+sys.stdout = open(data_folder+'/RUN.log', "w")
 ps=[]
 num_of_data = 8
 CSF = np.zeros(num_of_data)
@@ -15,10 +16,10 @@ GM = np.zeros(num_of_data)
 WM = np.zeros(num_of_data)
 for i in range(num_of_data):
     print i
-    movingIm = data_folder+'/Iter0_T1_'+str(i)+'.nrrd'
-    outputIm = data_folder+'/deformed_T1_'+str(i)+'.nrrd'
-    outputTransform = data_folder+'/T1_'+str(i)+'.tfm'
-    outputDVF = data_folder +'/DVF_T1_'+str(i)+'.nrrd'
+    movingIm = data_folder+'/Iter0_Flair_'+str(i)+'.nrrd'
+    outputIm = data_folder+'/deformed_Flair_'+str(i)+'.nrrd'
+    outputTransform = data_folder+'/Flair_'+str(i)+'.tfm'
+    outputDVF = data_folder +'/DVF_Flair_'+str(i)+'.nrrd'
   
 
     logFile = open(data_folder+'_RUN_'+ str(i)+'.log', 'w')
@@ -37,7 +38,7 @@ for i in range(num_of_data):
     WM[i] = stats[2,metricInx]
     GM[i] = stats[3,metricInx]
 
-    gridVisDVF(outputDVF,77,'DVF_Vis_T1_'+str(i), data_folder,outputIm,20)
+    gridVisDVF(outputDVF,77,'DVF_Vis_Flair_'+str(i), data_folder,outputIm,20)
 print 'CSF',CSF
 print 'WM',WM
 print 'GM',GM
