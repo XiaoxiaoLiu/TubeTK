@@ -9,9 +9,9 @@ from low_rank_atlas_iter import *
 
 
 
-lamda=0.7
+lamda=0.9
 selection = range(8)
-result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/RegulateBspline_w'+str(lamda)
+result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/Flair_w'+str(lamda)
 
 
 #useData_BRATS2_Synthetic()
@@ -46,7 +46,7 @@ def main():
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
-        Y= loaddata(num_of_data,iterCount-1,'T1')
+        Y= loaddata(num_of_data,iterCount-1,'T')
         low_rank = loaddata(num_of_data,iterCount,'LowRank')
         sparse= loaddata(num_of_data,iterCount,'Sparse')
         fig = plt.figure(figsize=(15,5))
