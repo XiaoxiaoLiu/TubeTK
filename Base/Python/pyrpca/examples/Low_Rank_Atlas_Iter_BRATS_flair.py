@@ -201,7 +201,7 @@ im_names =[]
 reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
 ######  set data folders
 
-lamda = 0.7
+lamda = 0.8
 
 #useData_BRATS2()
 #selection = range(8)

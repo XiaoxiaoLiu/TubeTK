@@ -98,7 +98,9 @@ def plotAllStats_Seperate(num_of_data,NUM_OF_ITERATIONS,metricInx,metricType):
              WM[inputNum,j]  = iterStats[2, metricInx]
              GM[inputNum,j]  = iterStats[3, metricInx]
           f.close()
-    print WM[:,NUM_OF_ITERATIONS-1]
+    print 'WM',WM[:,NUM_OF_ITERATIONS-1]
+    print 'GM',GM[:,NUM_OF_ITERATIONS-1]
+    print 'CSF',CSF[:,NUM_OF_ITERATIONS-1]
     plt.figure()
     for i in range(num_of_data):
       plt.plot(CSF[i,:])
@@ -137,6 +139,9 @@ def plotAllStats(num_of_data,NUM_OF_ITERATIONS,metricInx,metricType):
              WM[inputNum,j]  = iterStats[2, metricInx]
              GM[inputNum,j]  = iterStats[3, metricInx]
           f.close()
+    print 'WM',WM[:,NUM_OF_ITERATIONS-1]
+    print 'GM',GM[:,NUM_OF_ITERATIONS-1]
+    print 'CSF',CSF[:,NUM_OF_ITERATIONS-1]
     plt.figure()
     plt.boxplot(CSF)
     plt.title('CSF label '+ metricType)
