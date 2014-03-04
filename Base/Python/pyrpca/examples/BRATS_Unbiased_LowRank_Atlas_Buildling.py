@@ -202,10 +202,11 @@ data_folder + '/HG/0025/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.787.mha'
 data_folder + '/HG/0026/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.793.mha',
 data_folder + '/HG/0027/VSD.Brain.XX.O.MR_Flair/VSD.Brain.XX.O.MR_Flair.799.mha'
 ]
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/Unbiased_LRA_FLAIR'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/Unbiased_LRA_FLAIR_w0.9'
     os.system('mkdir '+ result_folder)
     # data selection
-    selection = [0,1,2,3,4,5,6,7,8,9]
+    selectioInputNumn = [0,2,5,7,12,17,19,23]
+
     reference_im_name = '/home/xiaoxiao/work/data/BRATS/SRI24/T1_Crop.nii.gz'
     return
 
@@ -277,8 +278,8 @@ def main():
     num_of_data = len(selection)
 
 
-    NUM_OF_ITERATIONS = 12
-    lamda = 0.8
+    NUM_OF_ITERATIONS = 7
+    lamda = 0.7
     sparsity = np.zeros(NUM_OF_ITERATIONS)
 
     gridSize = [3,5,3]

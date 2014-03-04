@@ -9,9 +9,9 @@ from low_rank_atlas_iter import *
 
 
 
-lamda=0.8
+lamda=0.9
 selection = range(8)
-result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/Flair_w'+str(lamda)
+result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/Flair_w'+str(lamda)
 
 
 
