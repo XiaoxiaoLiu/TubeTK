@@ -325,6 +325,22 @@ def AverageImages(listOfImages,outputIm):
     process.wait()
     return
 
+def applyInverseDVFToImage(DVFImage, inputImage, outputImage, EXECUTE=False):
+    result_folder = os.path.dirname(outputImage)
+    cmd ='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample ' \
+      +' --inputVolume '    +  inputImage \
+      +' --outputVolume '   +  outputImage \
+      +' --referenceVolume '   +  inputImage\
+      +' --pixelType float ' \
+      +' --inverseTransform  '\
+      +' --deformationVolume '  + DVFImage \
+      +' --defaultValue 0 --numberOfThreads -1 '
+    if (EXECUTE):
+        tempFile = open(result_folder+'/applyInverseDVF.log', 'w')
+        process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
+        process.wait()
+        tempFile.close()
+    return cmd
 
 def applyInverseDVFToTissue(DVFImage, inputTissueImage, outputTissueImage, EXECUTE=False):
     result_folder = os.path.dirname(outputTissueImage)
