@@ -6,16 +6,11 @@ from low_rank_atlas_iter import *
 data_folder= '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data'
 
 
-def readIntoList(filename):
-   flist = []
-   with open(filename) as f:
-         flist = f.read().splitlines()
-   return flist
 
-t1_im_names = readIntoList(data_folder +'/T1_FN.txt')
-t2_im_names = readIntoList(data_folder +'/T2_FN.txt')
-flair_im_names = readIntoList(data_folder +'/Flair_FN.txt')
-tumor_im_names = readIntoList(data_folder +'/Tumor_FN.txt')
+t1_im_names = readTxtIntoList(data_folder +'/T1_FN.txt')
+t2_im_names = readTxtIntoList(data_folder +'/T2_FN.txt')
+flair_im_names = readTxtIntoList(data_folder +'/Flair_FN.txt')
+tumor_im_names = readTxtIntoList(data_folder +'/Tumor_FN.txt')
 
 
 selection = [0,1,3,4,6,7,9,10]

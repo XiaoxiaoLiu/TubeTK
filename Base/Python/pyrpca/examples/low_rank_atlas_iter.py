@@ -15,6 +15,13 @@ import gc
 ###################################################
 # preprocessing
 
+def readTxtIntoList(filename):
+   flist = []
+   with open(filename) as f:
+         flist = f.read().splitlines()
+   return flist
+
+
 def CropImage(inIm_name, outputIm_name, lowerCropSize, upperCropSize):
     inIm = sitk.ReadImage(inIm_name)
     crop = sitk.CropImageFilter()
