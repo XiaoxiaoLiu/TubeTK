@@ -14,9 +14,6 @@ selection = range(8)
 result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/Flair_w'+str(lamda)
 
 
-#useData_BRATS2_Synthetic()
-#result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Synthetic_Data/RegulateBSpline_w'+str(lamda)
-#selection = range(8)
 
 reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
 im_ref = sitk.ReadImage(reference_im_name) # image in SITK format
@@ -46,7 +43,7 @@ def main():
     Y = np.zeros((vector_length,num_of_data))
     for iterCount in range(1,NUM_OF_ITERATIONS + 1):
 
-        Y= loaddata(num_of_data,iterCount-1,'T')
+        Y= loaddata(num_of_data,iterCount-1,'Flair')
         low_rank = loaddata(num_of_data,iterCount,'LowRank')
         sparse= loaddata(num_of_data,iterCount,'Sparse')
         fig = plt.figure(figsize=(15,5))

@@ -14,9 +14,9 @@ im_names =[]
 
 def main():
     global result_folder, NUM_OF_ITERATIONS, num_of_data 
-    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/LRA_Results_T1_w0.7'
+    result_folder = '/home/xiaoxiao/work/data/BRATS/BRATS-2/Image_Data/Flair_w0.8'
     num_of_data = 8
-    NUM_OF_ITERATIONS = 15
+    NUM_OF_ITERATIONS = 10
 
     sum_sparse = np.zeros((num_of_data, NUM_OF_ITERATIONS))
     for inputNum in range(num_of_data):
@@ -32,7 +32,7 @@ def main():
 
     plt.figure()
     plt.boxplot(sum_sparse)
-    plt.title('Sum of Absolute Sparse Component')
+    plt.title('Sum of Absolute Sparse Image')
     plt.xlabel('Iterations')
     plt.savefig(result_folder+'/SumSparse.png')
 
