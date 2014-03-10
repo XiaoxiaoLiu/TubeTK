@@ -14,8 +14,10 @@ result_folder = data_folder +'/Flair_w0.8'
 
 num_of_data = 8
 for i in range(num_of_data):
-        SparseImage = result_folder+'/Iter5_Sparse_'+str(i)+'.nrrd'
-        DeformedSparseImage = sparse_result_folder+'/deformedIter5_Sparse_'+str(i)+'.nrrd'
-        DVFImage = result_folder+'/Iter4_Composed_DVF_'+str(i)+'.nrrd'
-        applyInverseDVFToImage(DVFImage,SparseImage,DeformedSparseImage,True)
+        SparseImage = result_folder+'/Iter10_Sparse_'+str(i)+'.nrrd'
+        DeformedSparseImage = sparse_result_folder+'/deformedIter10_Sparse_'+str(i)+'.nrrd'
+        DVFImage = result_folder+'/Iter9_Composed_DVF_'+str(i)+'.nrrd'
+        inverseDVFImage = result_folder+'/Iter9_Composed_DVF_INV_'+str(i)+'.nrrd'
+        genInverseDVF(DVFImage, inverseDVFImage, True)
+        updateInputImageWithDVF(SparseImage,SparseImage,inverseDVFImage, DeformedSparseImage,True)
 

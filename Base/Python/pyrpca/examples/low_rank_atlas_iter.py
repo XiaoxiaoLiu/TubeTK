@@ -117,7 +117,6 @@ def gridVisDVF(dvfImFileName,sliceNum = -1,titleString = 'DVF',saveFigPath ='.',
      plt.savefig(saveFigPath + '/' + titleString)
      fig.clf()
      plt.close(fig)
-     del dvfIm, gridX, gridY,idMap,bgGrayIm,mapIm
      return
 
 ######################  REGISTRATIONs ##############################
@@ -325,24 +324,20 @@ def AverageImages(listOfImages,outputIm):
     process.wait()
     return
 
-def applyInverseDVFToImage(DVFImage, inputImage, outputImage, EXECUTE=False):
-    result_folder = os.path.dirname(outputImage)
-    cmd ='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample ' \
-      +' --inputVolume '    +  inputImage \
-      +' --outputVolume '   +  outputImage \
-      +' --referenceVolume '   +  inputImage\
-      +' --pixelType float ' \
-      +' --inverseTransform  '\
-      +' --deformationVolume '  + DVFImage \
-      +' --defaultValue 0 --numberOfThreads -1 '
+def genInverseDVF(DVFImage, InverseDVFImage, EXECUTE = False):
+    result_folder = os.path.dirname(InverseDVFImage)
+    cmd ='/home/xiaoxiao/work/bin/ITKUtils/bin/InvertDeformationField '\
+        + DVFImage \
+        +' ' \
+        + InverseDVFImage
     if (EXECUTE):
-        tempFile = open(result_folder+'/applyInverseDVF.log', 'w')
+        tempFile = open(result_folder+'/InverseDVF.log', 'w')
         process = subprocess.Popen(cmd, stdout = tempFile, shell = True)
         process.wait()
         tempFile.close()
     return cmd
 
-def applyInverseDVFToTissue(DVFImage, inputTissueImage, outputTissueImage, EXECUTE=False):
+def TBDapplyInverseDVFToTissue(DVFImage, inputTissueImage, outputTissueImage, EXECUTE=False):
     result_folder = os.path.dirname(outputTissueImage)
     reference_im_name = '/home/xiaoxiao/work/data/SRI24/T1_Crop.nii.gz'
     cmd ='/home/xiaoxiao/work/bin/BRAINSTools/bin/BRAINSResample ' \
@@ -350,7 +345,6 @@ def applyInverseDVFToTissue(DVFImage, inputTissueImage, outputTissueImage, EXECU
       +' --outputVolume '   +  outputTissueImage \
       +' --referenceVolume '   +  reference_im_name\
       +' --pixelType short ' \
-      +' --inverseTransform  '\
       +' --deformationVolume '  + DVFImage \
       +' --defaultValue 0 --numberOfThreads -1 '
     print cmd
